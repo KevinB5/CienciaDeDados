@@ -46,19 +46,30 @@ def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm
     plt.xlabel('Predicted label')
     plt.show()
 
-def cross_val(X,Y,X_train,Y_train):
-    cv_scores = []
+def split_train_test(X,Y):
+    #Split dos dados com 70% para train e os restantes para teste
+    X_train,X_test,Y_train,Y_test = train_test_split(X,Y, train_size = 0.7, stratify = Y)
 
-    #Perfomance cross validation com 10-fold
-    for i in range(3,len(X)-1):
-        knn = KNeighborsClassifier(n_neighbors = i)
-        scores = cross_val_score(knn,X_train,Y_train,cv = 10)
-        cv_scores.append(scores.mean())
-
-    return cv_scores
+    return X_train,X_test,Y_train,Y_test
 
 
-def exercise_1(X,Y,X_train,X_test,Y_train,Y_test,classes):
+def cross_val(X,Y):
+
+    #Split dos dados com 10 folds para train e os restantes para teste
+    skf = StratifiedKFold(n_splits = 10, random_state = True)
+    for train_index, test_index in skf.split(X,Y):
+        X_train, X_test = X.loc[train_index], X.loc[test_index]
+        Y_train, Y_test = Y.loc[train_index], Y.loc[test_index]
+
+    return X_train,X_test,Y_train,Y_test
+
+
+def exercise_1(X,Y,classes):
+
+    # Split data with train_test_split
+    X_train,X_test,Y_train,Y_test = split_train_test(X,Y)
+    # Split data with StratifiedKFold
+    # X_train,X_test,Y_train,Y_test = cross_val(X,Y)
 
     #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
     knn = KNeighborsClassifier(n_neighbors = 3)
@@ -67,28 +78,38 @@ def exercise_1(X,Y,X_train,X_test,Y_train,Y_test,classes):
     #Predicao  
     Y_predict = model.predict(X_test)
 
-    #a) Accuracy aproximadamente 93,3 %
-    accuracy = accuracy_score(Y_test, Y_predict)
-    print "Accuracy KNN -",accuracy
+    #a) Accuracy com train_test_split varia entre 93,3% e 100%
+    accuracy_train_test = accuracy_score(Y_test, Y_predict)
+    print "Accuracy KNN splliting data with train_test =",accuracy_train_test
 
-    c_validation = cross_val(X,Y,X_train,Y_train)
+    #a) Accuracy com StratifiedKFold varia entre 
+    # accuracy_StratifiedKFold = accuracy_score(Y_test, Y_predict)
+    # print "Accuracy KNN splliting data with StratifiedKFold =",accuracy_StratifiedKFold
 
     # conf_matrix =  confusion_matrix(Y_test, Y_predict)
 
     # plot_confusion_matrix(conf_matrix,classes)
 
-def exercise_2(X,Y,X_train,X_test,Y_train,Y_test,classes):
+def exercise_2(X,Y,classes):
+
+    # Split data with train_test_split
+    X_train,X_test,Y_train,Y_test = split_train_test(X,Y)
+    # Split data with StratifiedKFold
+    # X_train,X_test,Y_train,Y_test = cross_val(X,Y)
 
     nb = GaussianNB()
+
     model = nb.fit(X_train,Y_train)
+
     Y_predict = model.predict(X_test)
 
-    #a)
-    accuracy = accuracy_score(Y_test, Y_predict)
-    print "Accuracy NB -",accuracy
+    #a) Accuracy com train_test_split varia entre 93,3% e 100%
+    accuracy_train_test = accuracy_score(Y_test, Y_predict)
+    print "Accuracy Naive_Bayes splliting data with train_test =",accuracy_train_test
 
-    validation = cross_val_score(nb,X,Y,cv=10)
-    print "Validation NB -",validation
+    #a) Accuracy com StratifiedKFold varia entre 
+    # accuracy_StratifiedKFold = accuracy_score(Y_test, Y_predict)
+    # print "Accuracy Naive_Bayes splliting data with StratifiedKFold =",accuracy_StratifiedKFold
 
     # conf_matrix = confusion_matrix(Y_test, Y_predict)
 
@@ -130,13 +151,11 @@ X = iris.iloc[:,:4]
 Y = iris['class']
 #Classes existentes
 classes = np.unique(Y)
-#Split dos dados com 70% para train e os restantes para teste
-X_train,X_test,Y_train,Y_test = train_test_split(X,Y, train_size = 0.7, stratify = Y)
 
 
-exercise_1(X,Y,X_train,X_test,Y_train,Y_test,classes)
-# print ' '
-# exercise_2(X,Y,X_train,X_test,Y_train,Y_test,classes)
+exercise_1(X,Y,classes)
+print ' '
+exercise_2(X,Y,classes)
 
 
 ##########################################################################################

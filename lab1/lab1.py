@@ -6,23 +6,29 @@ from scipy import stats
 from sklearn import preprocessing
 
 
-#1a
+##########1a
 data = pd.read_csv('algae.csv')
 season = data['season']
 ph = data['pH']
 Ammonium = data['Ammonium']
+
+##########1b
 # print data.shape
 # print data.iloc[0,:][3]
-
-# print len([x for x in data.iloc[0,:] if type(x) == np.float64])
-
 # print data.head()
 # print data.describe()
 # print data['season'].describe()
 # print season.head()
-# print season.describe()
 
-seasons = np.unique(season)
+
+###########1c
+# print len([x for x in data.iloc[0,:] if type(x) == np.float64])
+
+
+###########1d
+
+#print season.describe()
+#seasons = np.unique(season)
 # spring = data[season == seasons[0]]
 # print len(spring)
 # summer = data[season == seasons[1]]
@@ -35,13 +41,15 @@ seasons = np.unique(season)
 # season_bins = np.arange(0,200,10)
 # data['season'].plot(kind='hist', bins = season_bins, legend = True)
 
+
+###########1e
 # print ph.dtype
 # print ph.describe()
 # print [x for x in np.unique(ph) if math.isnan(x) == False]
 # print len([x for x in np.unique(ph) if math.isnan(x) == True])
 
 
-########### E) OUTLIERS
+########### OUTLIERS
 # ###Retirar valores nan
 # ph = ph[~np.isnan(ph)]
 # # ph = np.sort(ph)

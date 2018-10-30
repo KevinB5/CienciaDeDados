@@ -94,17 +94,43 @@ Ammonium = data['Ammonium']
 
 
 pH_Ammonium = data.loc[:,['Ammonium','pH']]
+
+indices_ph_nan = np.argwhere(np.isnan(ph))
+indices_Ammonium_nan = np.argwhere(np.isnan(Ammonium))
+
+indices_nan = np.vstack((indices_ph_nan,indices_Ammonium_nan))
+idx_nan = list(indices_nan.ravel())
+print idx_nan
+
+ph = ph.drop(idx_nan)
+Ammonium = Ammonium.drop(idx_nan)
+
 # ph = ph[~np.isnan(ph)]
 # Ammonium = Ammonium[~np.isnan(Ammonium)]
+
 
 pHnorm = (ph - ph.min())/(ph.max() - ph.min())
 AmmoniumNorm = (Ammonium - Ammonium.min())/(Ammonium.max() - Ammonium.min()) 
 
-print pHnorm
-print AmmoniumNorm
-# pH_Ammonium.hist()
-# print np.linalg.norm(data.loc[:,'pH'])
+# print "Norm1 ",pHnorm
+# print "Norm1 ",AmmoniumNorm
+
+pHnorm2 = ph / np.linalg.norm(ph)
+AmmoniumNorm2 = Ammonium / np.linalg.norm(Ammonium)
+
+# print "Norm2 ",pHnorm2
+# print "Norm2 ",AmmoniumNorm2
+
+# print "Normalizacao ", np.all(pHnorm2 == pHnorm) 
+
+plt.figure()
+plt.scatter(pHnorm2,AmmoniumNorm2)
+
+plt.figure()
 plt.scatter(pHnorm,AmmoniumNorm)
 plt.show()
+
+print data.head()
+print np.cov(data.loc[:,['pH','Oxygen','Chloride','Nitrates','Ammonium','Orthophosphate','Phosphate','Chlorophyll']])
 
 

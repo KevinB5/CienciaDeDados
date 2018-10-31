@@ -6,9 +6,12 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import r2_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
+
+from mpl_toolkits.mplot3d import Axes3D
 
 def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm.Blues):
     """
@@ -46,70 +49,86 @@ def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm
     plt.xlabel('Predicted label')
     plt.show()
 
-def split_train_test(X,Y):
+def plt_Prediction_Train_Test_Split(Y_test,Y_predict):
+
+    #Plot the model
+    plt.scatter(Y_test,Y_predict)
+    plt.title('Train_Test_Train')
+    plt.xlabel("True Values")
+    plt.ylabel("Predictions")
+    plt.show()
+
+def plt_Prediction_Cross_Validation(Y_test,Y_predict,k):
+
+    #Plot the model
+    plt.scatter(Y_test,Y_predict)
+    plt.title('Cross validation K = ' + str(k))
+    plt.xlabel("True Values")
+    plt.ylabel("Predictions")
+    plt.show()
+
+def split_train_test(X,Y,classifier):
     #Split dos dados com 70% para train e os restantes para teste
-    X_train,X_test,Y_train,Y_test = train_test_split(X,Y, train_size = 0.7, stratify = Y)
+    X_train,X_test,Y_train,Y_test = train_test_split(X,Y, test_size = 0.3)
+    #Treinar o modelo
+    model = classifier.fit(X_train,Y_train)
+    #Predicao  
+    Y_predict = model.predict(X_test)
+    #Plot the model
+    plt_Prediction_Train_Test_Split(Y_test,Y_predict)
+    #Accuracy
+    accuracy_test = accuracy_score(Y_test, Y_predict)
 
-    return X_train,X_test,Y_train,Y_test
+    return accuracy_test
 
 
-def cross_val(X,Y):
+def cross_val(X,Y,classifier):
+
+    accuracies_test = []
+    k=1
 
     #Split dos dados com 10 folds para train e os restantes para teste
-    skf = StratifiedKFold(n_splits = 10, random_state = True)
+    skf = StratifiedKFold(n_splits = 10, random_state = None, shuffle = False)
     for train_index, test_index in skf.split(X,Y):
         X_train, X_test = X.loc[train_index], X.loc[test_index]
         Y_train, Y_test = Y.loc[train_index], Y.loc[test_index]
+        #Treinar o modelo
+        model = classifier.fit(X_train,Y_train)
+        #Predicao  
+        Y_predict = model.predict(X_test)
+        #Plot the model
+        plt_Prediction_Cross_Validation(Y_test,Y_predict,k)
+        #Accuracy
+        accuracy_test = accuracy_score(Y_test, Y_predict)
 
-    return X_train,X_test,Y_train,Y_test
+        accuracies_test.append(accuracy_test)
+        k+=1
+
+    return np.mean(accuracies_test)
 
 
 def exercise_1(X,Y,classes):
 
-    # Split data with train_test_split
-    X_train,X_test,Y_train,Y_test = split_train_test(X,Y)
-    # Split data with StratifiedKFold
-    # X_train,X_test,Y_train,Y_test = cross_val(X,Y)
-
     #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
     knn = KNeighborsClassifier(n_neighbors = 3)
-    #Treinar o modelo
-    model = knn.fit(X_train,Y_train)
-    #Predicao  
-    Y_predict = model.predict(X_test)
 
-    #a) Accuracy com train_test_split varia entre 93,3% e 100%
-    accuracy_train_test = accuracy_score(Y_test, Y_predict)
-    print "Accuracy KNN splliting data with train_test =",accuracy_train_test
-
-    #a) Accuracy com StratifiedKFold varia entre 
-    # accuracy_StratifiedKFold = accuracy_score(Y_test, Y_predict)
-    # print "Accuracy KNN splliting data with StratifiedKFold =",accuracy_StratifiedKFold
+    # Accuracy train_test_split
+    print "Accuracy Test KNN splliting data with train_test =",split_train_test(X,Y,knn)
+    # Accuracy StratifiedKFold
+    print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)
 
     # conf_matrix =  confusion_matrix(Y_test, Y_predict)
 
     # plot_confusion_matrix(conf_matrix,classes)
 
 def exercise_2(X,Y,classes):
-
-    # Split data with train_test_split
-    X_train,X_test,Y_train,Y_test = split_train_test(X,Y)
-    # Split data with StratifiedKFold
-    # X_train,X_test,Y_train,Y_test = cross_val(X,Y)
-
+    #Instanciar o modelo de apredizagem com Naive Bayes
     nb = GaussianNB()
 
-    model = nb.fit(X_train,Y_train)
-
-    Y_predict = model.predict(X_test)
-
-    #a) Accuracy com train_test_split varia entre 93,3% e 100%
-    accuracy_train_test = accuracy_score(Y_test, Y_predict)
-    print "Accuracy Naive_Bayes splliting data with train_test =",accuracy_train_test
-
-    #a) Accuracy com StratifiedKFold varia entre 
-    # accuracy_StratifiedKFold = accuracy_score(Y_test, Y_predict)
-    # print "Accuracy Naive_Bayes splliting data with StratifiedKFold =",accuracy_StratifiedKFold
+    # Accuracy train_test_split
+    print "Accuracy Test Naive Bayes splliting data with train_test =",split_train_test(X,Y,nb)
+    # Accuracy StratifiedKFold
+    print "Accuracy Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb)
 
     # conf_matrix = confusion_matrix(Y_test, Y_predict)
 
@@ -132,8 +151,8 @@ def exercise_3(neighbors,X_train,X_test,Y_train,Y_test,classes):
 
 def exercise_4(X_train,X_test,Y_train,Y_test,classes):
 
-    knn = GaussianNB()
-    model = knn.fit(X_train,Y_train)
+    nb = GaussianNB()
+    model = nb.fit(X_train,Y_train)
     Y_predict = model.predict(X_test)
 
     accuracy = accuracy_score(Y_test, Y_predict)
@@ -152,10 +171,25 @@ Y = iris['class']
 #Classes existentes
 classes = np.unique(Y)
 
+# idx_virg = np.argwhere(Y=='Iris-virginica')
+# print idx_virg
+# iris_setosa =  iris.loc[iris['class'] == 'Iris-setosa'].iloc[:,:4]
+# iris_versicolor =  iris.loc[iris['class'] == 'Iris-versicolor'].iloc[:,:4]
+# iris_virginica =  iris.loc[iris['class'] == 'Iris-virginica'].iloc[:,:4]
+# print X[0:5]
+# print Y
 
 exercise_1(X,Y,classes)
 print ' '
 exercise_2(X,Y,classes)
+
+
+# plt.figure()
+# ax = plt.axes(projection = '3d')
+# ax.scatter3D(iris_setosa.iloc[:,0],iris_setosa.iloc[:,1],iris_setosa.iloc[:,2],'green')
+# ax.scatter3D(iris_versicolor.iloc[:,0],iris_versicolor.iloc[:,1],iris_versicolor.iloc[:,2],'blue')
+# ax.scatter3D(iris_virginica.iloc[:,0],iris_virginica.iloc[:,1],iris_virginica.iloc[:,2],'red')
+# plt.show()
 
 
 ##########################################################################################

@@ -1,17 +1,19 @@
 import numpy as np
 import pandas as pd
 import itertools
+
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import r2_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
-
 from mpl_toolkits.mplot3d import Axes3D
+
 
 def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm.Blues):
     """
@@ -68,86 +70,100 @@ def plt_Prediction_Cross_Validation(Y_test,Y_predict,k):
     plt.show()
 
 def split_train_test(X,Y,classifier):
-    #Split dos dados com 70% para train e os restantes para teste
-    X_train,X_test,Y_train,Y_test = train_test_split(X,Y, test_size = 0.3)
-    #Treinar o modelo
+    #Split the data with 70% for train and the rest to test
+    X_train,X_test,Y_train,Y_test = train_test_split(X,Y, train_size = 0.8)
+    #Trainning the model
     model = classifier.fit(X_train,Y_train)
     #Predicao  
     Y_predict = model.predict(X_test)
     #Plot the model
-    plt_Prediction_Train_Test_Split(Y_test,Y_predict)
+    # plt_Prediction_Train_Test_Split(Y_test,Y_predict)
     #Accuracy
     accuracy_test = accuracy_score(Y_test, Y_predict)
+    #Calculate Confusion MAtrix
+    conf_matrix =  confusion_matrix(Y_test, Y_predict)
+    #show Confusion Matrix
+    # plot_confusion_matrix(conf_matrix,classes)
 
     return accuracy_test
-
 
 def cross_val(X,Y,classifier):
 
     accuracies_test = []
     k=1
 
-    #Split dos dados com 10 folds para train e os restantes para teste
-    skf = StratifiedKFold(n_splits = 10, random_state = None, shuffle = False)
+    #Split the data with 10 folds for train and the rest to test 
+    skf = StratifiedKFold(n_splits = 3, random_state = None, shuffle = True)
     for train_index, test_index in skf.split(X,Y):
         X_train, X_test = X.loc[train_index], X.loc[test_index]
         Y_train, Y_test = Y.loc[train_index], Y.loc[test_index]
-        #Treinar o modelo
+        #Trainning the model
         model = classifier.fit(X_train,Y_train)
-        #Predicao  
+        #Prediction  
         Y_predict = model.predict(X_test)
         #Plot the model
-        plt_Prediction_Cross_Validation(Y_test,Y_predict,k)
+        # plt_Prediction_Cross_Validation(Y_test,Y_predict,k)
         #Accuracy
         accuracy_test = accuracy_score(Y_test, Y_predict)
-
+        #Put all accuricies in array to calculate mean accuracy
         accuracies_test.append(accuracy_test)
+        #Count KFold
         k+=1
+        #Calculate Confusion Matrix
+        conf_matrix = confusion_matrix(Y_test, Y_predict)
+        #Show Confusion Matrix
+        # plot_confusion_matrix(conf_matrix,classes)
 
-    return np.mean(accuracies_test)
+    return np.mean(accuracies_test),np.std(accuracies_test)
+
+# def cross_val_2(X,Y,classifier):
+
+#     accuracies_test = []
+#     k=1
+
+#     #Split the data with 10 folds for train and the rest to test 
+#     skf = StratifiedKFold(n_splits = 10, random_state = 0, shuffle = True)
+#     #Prediction
+#     est = cross_val_predict(classifier,X,Y, cv = skf)
+#     #Prob Error rate
+#     pErro = np.sum(est != Y)/(float)(len(est))
+
+#     accuracy = cross_val_score(classifier,X,Y,cv = skf)
+
+#     return np.mean(accuracy)
 
 
-def exercise_1(X,Y,classes):
+def exercise_1(X,Y,classes,neighbors):
 
     #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
-    knn = KNeighborsClassifier(n_neighbors = 3)
-
+    knn = KNeighborsClassifier(n_neighbors = neighbors)
     # Accuracy train_test_split
     print "Accuracy Test KNN splliting data with train_test =",split_train_test(X,Y,knn)
     # Accuracy StratifiedKFold
-    print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)
-
-    # conf_matrix =  confusion_matrix(Y_test, Y_predict)
-
-    # plot_confusion_matrix(conf_matrix,classes)
+    print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[0]
+    # Standart desviation StratifiedKFold
+    print "Standart desviation Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[1]
 
 def exercise_2(X,Y,classes):
     #Instanciar o modelo de apredizagem com Naive Bayes
     nb = GaussianNB()
-
     # Accuracy train_test_split
     print "Accuracy Test Naive Bayes splliting data with train_test =",split_train_test(X,Y,nb)
     # Accuracy StratifiedKFold
-    print "Accuracy Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb)
+    print "Accuracy Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb)[0]
+    # Standart desviation StratifiedKFold
+    print "Standart desviation Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb)[1]
 
-    # conf_matrix = confusion_matrix(Y_test, Y_predict)
+def exercise_3(X,Y,classes,neighbors):
 
-    # plot_confusion_matrix(conf_matrix,classes)
-
-def exercise_3(neighbors,X_train,X_test,Y_train,Y_test,classes):
-
-    #a,b)
-    accuracies = []
-
-    for i in neighbors:
-        knn = KNeighborsClassifier(n_neighbors = i)
-        model = knn.fit(X_train,Y_train)
-        Y_predict = model.predict(X_test)
-
-        accuracy = accuracy_score(Y_test, Y_predict)
-        accuracies.append(accuracy)
-
-    return accuracies
+    #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
+    knn = KNeighborsClassifier(n_neighbors = neighbors)
+    # Accuracy train_test_split
+    print "Accuracy Test KNN splliting data with train_test =",split_train_test(X,Y,knn)
+    # Accuracy StratifiedKFold
+    print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[0]
+    # Standart desviation StratifiedKFold
+    print "Standart desviation Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[1]
 
 def exercise_4(X_train,X_test,Y_train,Y_test,classes):
 
@@ -162,14 +178,18 @@ def exercise_4(X_train,X_test,Y_train,Y_test,classes):
 
 ##########################################################################################
 
-#Leitura dos dados
-iris = pd.read_csv('iris.csv')
-#Instancias 
-X = iris.iloc[:,:4]
-#Classe correspondente aos dados
-Y = iris['class']
-#Classes existentes
-classes = np.unique(Y)
+# #Leitura dos dados
+# iris = pd.read_csv('iris.csv')
+# #Instancias 
+# X = iris.iloc[:,:4]
+# #Classe correspondente aos dados
+# Y = iris['class']
+# #Classes existentes
+# classes = np.unique(Y)
+
+# exercise_1(X,Y,classes,3)
+# print ' '
+# exercise_2(X,Y,classes)
 
 # idx_virg = np.argwhere(Y=='Iris-virginica')
 # print idx_virg
@@ -178,11 +198,6 @@ classes = np.unique(Y)
 # iris_virginica =  iris.loc[iris['class'] == 'Iris-virginica'].iloc[:,:4]
 # print X[0:5]
 # print Y
-
-exercise_1(X,Y,classes)
-print ' '
-exercise_2(X,Y,classes)
-
 
 # plt.figure()
 # ax = plt.axes(projection = '3d')
@@ -197,16 +212,15 @@ exercise_2(X,Y,classes)
 
 # neighbors = [1,5,10,15,50,100]
 
-# glass = pd.read_csv('glass.csv')
+glass = pd.read_csv('glass.csv')
 
-# #Dados ate a 9 colunas
-# X = glass.iloc[:,:9]
-# #Classe correspondente aos dados
-# Y = glass['Type']
-# #Calsses existentes
-# classes = np.unique(Y)
+#Dados ate a 9 colunas
+X = glass.iloc[:,:9]
+#Classe correspondente aos dados
+Y = glass['Type']
+#Calsses existentes
+classes = np.unique(Y)
 
-# X_train,X_test,Y_train,Y_test = train_test_split(X,Y)
+exercise_3(neighbors,X_train,X_test,Y_train,Y_test,classes)
 
-# print exercise_3(neighbors,X_train,X_test,Y_train,Y_test,classes)
-# print exercise_4(X_train,X_test,Y_train,Y_test,classes)
+exercise_4(X_train,X_test,Y_train,Y_test,classes)

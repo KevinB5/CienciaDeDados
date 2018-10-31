@@ -66,14 +66,14 @@ def roc_curve_func(Y_test,predict):
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
     plt.legend(loc="lower right")
-    plt.show()
 
 
 
-data_bank = pd.read_csv('bank.csv')
-data_bank = preprocessData(data_bank)
 
-print data_bank.columns
+# data_bank = pd.read_csv('bank.csv')
+# data_bank = preprocessData(data_bank)
+
+# print data_bank.columns
 # print data_bank['region']
 
 # df = label_encoder.fit_transform(data_bank['married'])
@@ -81,10 +81,47 @@ print data_bank.columns
 # print data_bank['region'].values.reshape(-1,1)
 # print len(data_bank['region_0'])
 
-X = data_bank.iloc[:,:data_bank.shape[1]-1]
-
+# X = data_bank.iloc[:,:data_bank.shape[1]-1]
+# print X.cov().shape
 # print data_bank.shape[1]-1
-Y = data_bank['pep']
+# Y = data_bank['pep']
+# print Y
+
+########## Exercicio1
+# X_train,X_test,Y_train,Y_test = train_test_split(X,Y)
+
+# predict = naive_Bayes(X_train,X_test,Y_train)
+
+# accuracy = accuracy_score(Y_test,predict)
+
+# print 'Accuracy ', accuracy
+
+# conf_matrix_sens_spec(Y_test,predict)
+
+# roc_curve_func(Y_test,predict,'darkorange')
+
+# plt.show()
+
+########## Exercicio2
+
+# predict, accuracy = Knn(X_train,X_test,Y_train,Y_test, 3)
+
+# print 'Accuracy ',accuracy
+
+# conf_matrix_sens_spec(Y_test,predict)
+
+# roc_curve_func(Y_test,predict,'blue')
+
+# plt.show()
+
+########## Exercicio3
+
+unbalanced_data = pd.read_csv('unbalanced.csv')
+unbalanced_data = preprocessData(unbalanced_data)
+
+X = unbalanced_data.iloc[:,:-1]
+# print X
+Y = unbalanced_data['Outcome']
 # print Y
 
 X_train,X_test,Y_train,Y_test = train_test_split(X,Y)
@@ -97,7 +134,11 @@ print 'Accuracy ', accuracy
 
 conf_matrix_sens_spec(Y_test,predict)
 
-roc_curve_func(Y_test,predict)
+# roc_curve_func(Y_test,predict,'darkorange')
+
+# plt.show()
+
+
 
 
 

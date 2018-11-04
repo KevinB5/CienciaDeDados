@@ -87,13 +87,13 @@ def split_train_test(X,Y,classifier):
 
     return accuracy_test
 
-def cross_val(X,Y,classifier):
+def cross_val(X,Y,classifier,splits):
 
     accuracies_test = []
     k=1
 
     #Split the data with 10 folds for train and the rest to test 
-    skf = StratifiedKFold(n_splits = 3, random_state = None, shuffle = True)
+    skf = StratifiedKFold(n_splits = splits, random_state = None, shuffle = True)
     for train_index, test_index in skf.split(X,Y):
         X_train, X_test = X.loc[train_index], X.loc[test_index]
         Y_train, Y_test = Y.loc[train_index], Y.loc[test_index]
@@ -133,50 +133,63 @@ def cross_val(X,Y,classifier):
 #     return np.mean(accuracy)
 
 
-def exercise_1(X,Y,classes,neighbors):
+def exercise_1(X,Y,neighbors):
 
     #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
     knn = KNeighborsClassifier(n_neighbors = neighbors)
     # Accuracy train_test_split
     print "Accuracy Test KNN splliting data with train_test =",split_train_test(X,Y,knn)
     # Accuracy StratifiedKFold
-    print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[0]
+    print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn,splits)[0]
     # Standart desviation StratifiedKFold
-    print "Standart desviation Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[1]
+    print "Standart desviation Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn,splits)[1]
 
-def exercise_2(X,Y,classes):
+def exercise_2(X,Y):
     #Instanciar o modelo de apredizagem com Naive Bayes
     nb = GaussianNB()
     # Accuracy train_test_split
     print "Accuracy Test Naive Bayes splliting data with train_test =",split_train_test(X,Y,nb)
     # Accuracy StratifiedKFold
-    print "Accuracy Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb)[0]
+    print "Accuracy Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[0]
     # Standart desviation StratifiedKFold
-    print "Standart desviation Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb)[1]
+    print "Standart desviation Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[1]
 
-def exercise_3(X,Y,classes,neighbors):
+def exercise_3(X,Y,neighbors):
 
-    #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
-    knn = KNeighborsClassifier(n_neighbors = neighbors)
+    accuricies_train_test = []
+    accuricies_cross_val = []
+    std_cross_val = []
+
+    for i in neighbors:
+
+        #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
+        knn = KNeighborsClassifier(n_neighbors = i)
+        accuricies_train_test.append(split_train_test(X,Y,knn))
+        accuricies_cross_val.append(cross_val(X,Y,knn,splits)[0])
+        std_cross_val.append(cross_val(X,Y,knn,splits)[1])
+
     # Accuracy train_test_split
-    print "Accuracy Test KNN splliting data with train_test =",split_train_test(X,Y,knn)
+    print "Accuracy Test KNN splliting data with train_test =",accuricies_train_test
     # Accuracy StratifiedKFold
-    print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[0]
+    print "Accuracy Test KNN splliting data with StratifiedKFold =",accuricies_cross_val
     # Standart desviation StratifiedKFold
-    print "Standart desviation Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn)[1]
+    print "Standart desviation Test KNN splliting data with StratifiedKFold =",std_cross_val
 
-def exercise_4(X_train,X_test,Y_train,Y_test,classes):
+def exercise_4(X,Y):
 
+    #Instanciar o modelo de apredizagem com Naive Bayes
     nb = GaussianNB()
-    model = nb.fit(X_train,Y_train)
-    Y_predict = model.predict(X_test)
-
-    accuracy = accuracy_score(Y_test, Y_predict)
-
-    print accuracy
+    # Accuracy train_test_split
+    print "Accuracy Test Naive Bayes splliting data with train_test =",split_train_test(X,Y,nb)
+    # Accuracy StratifiedKFold
+    print "Accuracy Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[0]
+    # Standart desviation StratifiedKFold
+    print "Standart desviation Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[1]
 
 
 ##########################################################################################
+
+splits = 10
 
 # #Leitura dos dados
 # iris = pd.read_csv('iris.csv')
@@ -187,9 +200,9 @@ def exercise_4(X_train,X_test,Y_train,Y_test,classes):
 # #Classes existentes
 # classes = np.unique(Y)
 
-# exercise_1(X,Y,classes,3)
+# exercise_1(X,Y,3)
 # print ' '
-# exercise_2(X,Y,classes)
+# exercise_2(X,Y)
 
 # idx_virg = np.argwhere(Y=='Iris-virginica')
 # print idx_virg
@@ -212,15 +225,17 @@ def exercise_4(X_train,X_test,Y_train,Y_test,classes):
 
 # neighbors = [1,5,10,15,50,100]
 
-glass = pd.read_csv('glass.csv')
+# glass = pd.read_csv('glass.csv')
+# print glass.shape
 
-#Dados ate a 9 colunas
-X = glass.iloc[:,:9]
-#Classe correspondente aos dados
-Y = glass['Type']
-#Calsses existentes
-classes = np.unique(Y)
+# #Dados ate a 9 colunas
+# X = glass.iloc[:,:9]
+# #Classe correspondente aos dados
+# Y = glass['Type']
+# #Calsses existentes
+# classes = np.unique(Y)
 
-exercise_3(neighbors,X_train,X_test,Y_train,Y_test,classes)
-
-exercise_4(X_train,X_test,Y_train,Y_test,classes)
+# print "Splits =",splits
+# exercise_3(X,Y,[1,5,10,15,50,100])
+# print ' '
+# exercise_4(X,Y)

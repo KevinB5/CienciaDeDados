@@ -134,7 +134,7 @@ def cross_val(X,Y,classifier,splits):
 
 
 ######### Para saber os FP e FN de uma classe considerada verdadeira,
-######### para o exercicio 1 é Iris-Virginica
+######### para o exercicio 1 -> Iris-Virginica
 # def fp_fn_class(Y_test,predict,i_class,classes):
 
 #     class_true = classes[i_class]
@@ -223,17 +223,23 @@ def exercise_4(X,Y):
 splits = 10
 
 # #Leitura dos dados
-# iris = pd.read_csv('iris.csv')
+iris = pd.read_csv('iris.csv')
 # #Instancias 
-# X = iris.iloc[:,:4]
+X = iris.iloc[:,:4]
 # #Classe correspondente aos dados
-# Y = iris['class']
+Y = iris['class']
 # #Classes existentes
 # classes = np.unique(Y)
 
 # exercise_1(X,Y,3)
 # print ' '
 # exercise_2(X,Y)
+
+# Apos o exercicio 1 e 2, concluimos que entre o classificador Knn e Naive Bayes obtemos prestações parecidas pois
+# a distribuição dos dados da base de dados Iris não tem muita sobreposição entre classes, tendo ambos os classificadores boas accuracy
+# Caso a base de dados tivesse mais sobreposição, o melhor classificador na teoria seria o Knn
+
+##########################################################################################
 
 # idx_virg = np.argwhere(Y=='Iris-virginica')
 # print idx_virg

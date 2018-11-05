@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
@@ -34,6 +35,41 @@ def preprocessData(df):
             pdf = pd.concat([pdf, temp], axis=1)
     return pdf
 
+def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm.Blues):
+    """
+        This function prints and plots the confusion matrix.
+        Normalization can be applied by setting `normalize=True`.
+    """
+    np.set_printoptions(precision=2)
+
+    if normalize:
+        soma = cnf_matrix.sum(axis=1)[:, np.newaxis]
+        cm = cnf_matrix.astype('float') / soma
+        title = "Normalized confusion matrix"
+    else:
+        cm = cnf_matrix
+        title = 'Confusion matrix, without normalization'
+
+    plt.figure()
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classesNames))
+    plt.xticks(tick_marks, classesNames, rotation=45)
+    plt.yticks(tick_marks, classesNames)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.show()
 
 def naive_Bayes(X_train,X_test,Y_test):
 
@@ -62,7 +98,7 @@ def roc_curve_func(Y_test,predict,roc_color):
     fpr, tpr, _ = roc_curve(Y_test,predict)
     roc_auc = auc(fpr,tpr)
 
-    plt.figure()
+    # plt.figure()
     plt.plot(fpr,tpr, color=roc_color,lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
@@ -71,7 +107,7 @@ def roc_curve_func(Y_test,predict,roc_color):
 def cross_val(X,Y,classifier,roc_color):
 
     accuracies_test = []
-    k=1
+    k=0
 
     #Split the data with k folds for train and the rest to test 
     skf = StratifiedKFold(n_splits = 3, random_state = None, shuffle = True)
@@ -89,23 +125,29 @@ def cross_val(X,Y,classifier,roc_color):
         #Put all accuricies in array to calculate mean accuracy
         accuracies_test.append(accuracy_test)
         #Count KFold
-        k+=1
+        
         #Calculate Confusion Matrix
-        conf_matrix = confusion_matrix(Y_test, Y_predict)
+        # conf_matrix = confusion_matrix(Y_test, Y_predict)
         #Show Confusion Matrix
-        plot_confusion_matrix(conf_matrix,classes)
+        # plot_confusion_matrix(conf_matrix,classes)
 
         conf_matrix_sens_spec(Y_test,Y_predict)
 
-        roc_curve_func(Y_test,predict,roc_color)
+        roc_curve_func(Y_test,Y_predict,roc_color[k])
+
+        k+=1
+
+    print "Accuracy Test -> ",accuracies_test
+
+    plt.show()
 
     return np.mean(accuracies_test),np.std(accuracies_test)
 
 
 
 
-# data_bank = pd.read_csv('bank.csv')
-# data_bank = preprocessData(data_bank)
+data_bank = pd.read_csv('bank.csv')
+data_bank = preprocessData(data_bank)
 
 # print data_bank.columns
 # print data_bank['region']
@@ -115,26 +157,38 @@ def cross_val(X,Y,classifier,roc_color):
 # print data_bank['region'].values.reshape(-1,1)
 # print len(data_bank['region_0'])
 
-# X = data_bank.iloc[:,:data_bank.shape[1]-1]
+X = data_bank.iloc[:,:data_bank.shape[1]-1]
 # print X.cov().shape
 # print data_bank.shape[1]-1
-# Y = data_bank['pep']
+Y = data_bank['pep']
 # print Y
 
 ########## Exercicio1
-# X_train,X_test,Y_train,Y_test = train_test_split(X,Y)
 
-# predict = naive_Bayes(X_train,X_test,Y_train)
+#Sensitivity: True Positive Rate 
+#the true positive rate, also called sensitivity,
+#is the fraction of correct predictions with respect to all points in the positive class,
+#that is, it is simply the recall for the positive class
+#   TPR = recallP = TP/TP+FN = TP/n1
 
-# accuracy = accuracy_score(Y_test,predict)
+#Specificity: True Negative Rate 
+#The true negative rate, also called specificity, is simply the recall for the negative class:
+#   TNR = specificity = recallN = TN/FP+TN = TN/n2 # where n2 is the size of the negative class.
 
-# print 'Accuracy ', accuracy
+#False Negative Rate
+#The false negative rate is defined as
+#   FNR=FN/TP+FN = FN/n1 = 1-sensitivity
 
-# conf_matrix_sens_spec(Y_test,predict)
+#False Positive Rate 
+#The false positive is defined as 
+#   FPR=FP/FP+TN = FP/n2 = 1-specificity
 
-# roc_curve_func(Y_test,predict,'darkorange')
+classifier1 = GaussianNB()
+roc_colors = ['darkorange', 'blue', 'green']
 
-# plt.show()
+cross_val(X,Y,classifier1,roc_colors)
+
+##############################################################################
 
 ########## Exercicio2
 
@@ -150,23 +204,21 @@ def cross_val(X,Y,classifier,roc_color):
 
 ########## Exercicio3
 
-unbalanced_data = pd.read_csv('unbalanced.csv')
-# unbalanced_data = preprocessData(unbalanced_data)
+# unbalanced_data = pd.read_csv('unbalanced.csv')
+# # unbalanced_data = preprocessData(unbalanced_data)
 
-X = unbalanced_data.iloc[:,:-1]
-# print X
-Y = unbalanced_data['Outcome']
-# print Y
+# X = unbalanced_data.iloc[:,:-1]
+# # print X
+# Y = unbalanced_data['Outcome']
+# # print Y
 
-classifier1 = GaussianNB()
+# classifier1 = GaussianNB()
 
-classifier2 = KNeighborsClassifier(n_neighbors = 1)
+# classifier2 = KNeighborsClassifier(n_neighbors = 1)
 
-classifier3 = KNeighborsClassifier(n_neighbors = 10)
+# classifier3 = KNeighborsClassifier(n_neighbors = 10)
 
-classifier4 = KNeighborsClassifier(n_neighbors = 100)
-
-
+# classifier4 = KNeighborsClassifier(n_neighbors = 100)
 
 # roc_curve_func(Y_test,predict,'darkorange')
 

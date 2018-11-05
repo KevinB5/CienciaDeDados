@@ -10,6 +10,8 @@ from sklearn.metrics import roc_curve, auc
 from sklearn import preprocessing
 import numpy as np
 
+from mpl_toolkits.mplot3d import Axes3D
+
 def preprocessData(df):
     label_encoder = preprocessing.LabelEncoder()
     dummy_encoder = preprocessing.OneHotEncoder()
@@ -93,7 +95,7 @@ def conf_matrix_sens_spec(Y_test,predict):
     specificity = tn*1./(tn+fp)
     print 'Specificity ',specificity
 
-def roc_curve_func(Y_test,predict,roc_color):
+def roc_curve_func(Y_test,predict,roc_color,title):
 
     fpr, tpr, _ = roc_curve(Y_test,predict)
     roc_auc = auc(fpr,tpr)
@@ -102,9 +104,10 @@ def roc_curve_func(Y_test,predict,roc_color):
     plt.plot(fpr,tpr, color=roc_color,lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
+    plt.title(title)
     plt.legend(loc="lower right")
 
-def cross_val(X,Y,classifier,roc_color):
+def cross_val(X,Y,classifier,roc_color,title):
 
     accuracies_test = []
     k=0
@@ -133,13 +136,13 @@ def cross_val(X,Y,classifier,roc_color):
 
         conf_matrix_sens_spec(Y_test,Y_predict)
 
-        roc_curve_func(Y_test,Y_predict,roc_color[k])
+        roc_curve_func(Y_test,Y_predict,roc_color[k],title)
 
         k+=1
 
     print "Accuracy Test -> ",accuracies_test
 
-    plt.show()
+
 
     return np.mean(accuracies_test),np.std(accuracies_test)
 
@@ -158,10 +161,28 @@ data_bank = preprocessData(data_bank)
 # print len(data_bank['region_0'])
 
 X = data_bank.iloc[:,:data_bank.shape[1]-1]
+# print X
 # print X.cov().shape
 # print data_bank.shape[1]-1
 Y = data_bank['pep']
 # print Y
+
+pep0 =  X.loc[Y == 0,['age','income','children']]
+# print pep0
+pep1 =  X.loc[Y == 1,['age','income','children']]
+
+plt.figure(figsize = (12,10))
+plt.subplot(221)
+plt.scatter(pep0.iloc[:,0],pep0.iloc[:,1],color='green')
+plt.scatter(pep1.iloc[:,0],pep1.iloc[:,1],color='blue')
+plt.title('Bank DataBase')
+plt.xlabel("Age")
+plt.ylabel("Income")
+# plt.show()
+# ax = plt.axes(projection = '3d')
+# ax.scatter3D(pep0.iloc[:,0],pep0.iloc[:,1],pep0.iloc[:,2],'green')
+# ax.scatter3D(pep1.iloc[:,0],pep1.iloc[:,1],pep1.iloc[:,2],'blue')
+# plt.show()
 
 ########## Exercicio1
 
@@ -183,24 +204,28 @@ Y = data_bank['pep']
 #The false positive is defined as 
 #   FPR=FP/FP+TN = FP/n2 = 1-specificity
 
-classifier1 = GaussianNB()
-roc_colors = ['darkorange', 'blue', 'green']
+# classifier1 = GaussianNB()
+# roc_colors = ['darkorange', 'blue', 'green']
 
-cross_val(X,Y,classifier1,roc_colors)
+# cross_val(X,Y,classifier1,roc_colors)
+# plt.show()
 
 ##############################################################################
 
 ########## Exercicio2
 
-# predict, accuracy = Knn(X_train,X_test,Y_train,Y_test, 3)
+classifier1 = GaussianNB()
+classifier2 = KNeighborsClassifier(n_neighbors = 3)
 
-# print 'Accuracy ',accuracy
+roc_colors = ['darkorange', 'blue', 'green']
 
-# conf_matrix_sens_spec(Y_test,predict)
-
-# roc_curve_func(Y_test,predict,'blue')
-
+plt.subplot(222)
+cross_val(X,Y,classifier1,roc_colors,'Naive_Bayes')
 # plt.show()
+plt.subplot(223)
+cross_val(X,Y,classifier2,roc_colors,'KNeighborsClassifier')
+
+plt.show()
 
 ########## Exercicio3
 

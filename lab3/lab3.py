@@ -167,17 +167,17 @@ X = data_bank.iloc[:,:data_bank.shape[1]-1]
 Y = data_bank['pep']
 # print Y
 
-pep0 =  X.loc[Y == 0,['age','income','children']]
-# print pep0
-pep1 =  X.loc[Y == 1,['age','income','children']]
+# pep0 =  X.loc[Y == 0,['age','income','children']]
+# # print pep0
+# pep1 =  X.loc[Y == 1,['age','income','children']]
 
-plt.figure(figsize = (12,10))
-plt.subplot(221)
-plt.scatter(pep0.iloc[:,0],pep0.iloc[:,1],color='green')
-plt.scatter(pep1.iloc[:,0],pep1.iloc[:,1],color='blue')
-plt.title('Bank DataBase')
-plt.xlabel("Age")
-plt.ylabel("Income")
+# plt.figure(figsize = (12,10))
+# plt.subplot(221)
+# plt.scatter(pep0.iloc[:,0],pep0.iloc[:,1],color='green')
+# plt.scatter(pep1.iloc[:,0],pep1.iloc[:,1],color='blue')
+# plt.title('Bank DataBase')
+# plt.xlabel("Age")
+# plt.ylabel("Income")
 # plt.show()
 # plt.figure()
 # ax = plt.axes(projection = '3d')
@@ -216,18 +216,32 @@ plt.ylabel("Income")
 
 ########## Exercicio2
 
-classifier1 = GaussianNB()
-classifier2 = KNeighborsClassifier(n_neighbors = 3)
+# pep0 =  X.loc[Y == 0,['age','income','children']]
+# # print pep0
+# pep1 =  X.loc[Y == 1,['age','income','children']]
 
-roc_colors = ['darkorange', 'blue', 'green']
+# plt.figure(figsize = (12,10))
+# plt.subplot(221)
+# plt.scatter(pep0.iloc[:,0],pep0.iloc[:,1],color='green')
+# plt.scatter(pep1.iloc[:,0],pep1.iloc[:,1],color='blue')
+# plt.title('Bank DataBase')
+# plt.xlabel("Age")
+# plt.ylabel("Income")
 
-plt.subplot(222)
-cross_val(X,Y,classifier1,roc_colors,'Naive_Bayes')
+# classifier1 = GaussianNB()
+# classifier2 = KNeighborsClassifier(n_neighbors = 3)
+
+# roc_colors = ['darkorange', 'blue', 'green']
+
+# plt.subplot(222)
+# cross_val(X,Y,classifier1,roc_colors,'Naive_Bayes')
+# # plt.show()
+# plt.subplot(223)
+# cross_val(X,Y,classifier2,roc_colors,'KNeighborsClassifier')
+
 # plt.show()
-plt.subplot(223)
-cross_val(X,Y,classifier2,roc_colors,'KNeighborsClassifier')
 
-plt.show()
+##############################################################################
 
 ########## Exercicio3
 

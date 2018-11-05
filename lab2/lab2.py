@@ -133,6 +133,37 @@ def cross_val(X,Y,classifier,splits):
 #     return np.mean(accuracy)
 
 
+######### Para saber os FP e FN de uma classe considerada verdadeira,
+######### para o exercicio 1 é Iris-Virginica
+# def fp_fn_class(Y_test,predict,i_class,classes):
+
+#     class_true = classes[i_class]
+#     classes = np.delete(classes,i_class)
+
+#     vir_size = Y_test==class_true
+#     TP_vir = Y_test[predict==class_true] == class_true
+
+#     # print np.sum(vir_size)
+#     # print np.sum(TP_vir)
+
+#     FP_0 = Y_test[predict==classes[0]] == class_true
+#     FP_1 = Y_test[predict==classes[1]] == class_true
+
+#     # print 'Falsos POsitivos VIR SET ',np.sum(FP_vir_set)
+#     # print 'Falsos POsitivos VIR VER ',np.sum(FP_vir_ver)
+
+#     FN_0 = Y_test[predict==class_true] == classes[0]
+#     FN_1 = Y_test[predict==class_true] == classes[1]
+
+#     # print 'Falsos Negativos VIR SET ',np.sum(FN_vir_set)
+#     # print 'Falsos Negativos VIR VER ',np.sum(FN_vir_ver)
+
+#     n_FP = np.sum(FP_0)+np.sum(FP_1)
+#     n_FN = np.sum(FN_0)+np.sum(FN_1)
+
+#     return n_FP, n_FN
+
+
 def exercise_1(X,Y,neighbors):
 
     #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)

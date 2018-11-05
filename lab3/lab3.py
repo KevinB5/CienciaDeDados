@@ -179,9 +179,11 @@ plt.title('Bank DataBase')
 plt.xlabel("Age")
 plt.ylabel("Income")
 # plt.show()
+# plt.figure()
 # ax = plt.axes(projection = '3d')
-# ax.scatter3D(pep0.iloc[:,0],pep0.iloc[:,1],pep0.iloc[:,2],'green')
-# ax.scatter3D(pep1.iloc[:,0],pep1.iloc[:,1],pep1.iloc[:,2],'blue')
+# ax.scatter3D(pep0.iloc[:,0],pep0.iloc[:,1],pep0.iloc[:,2],color='green')
+# ax.scatter3D(pep1.iloc[:,0],pep1.iloc[:,1],pep1.iloc[:,2],color='blue')
+
 # plt.show()
 
 ########## Exercicio1

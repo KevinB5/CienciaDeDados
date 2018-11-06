@@ -149,8 +149,8 @@ def cross_val(X,Y,classifier,roc_color,title):
 
 
 
-data_bank = pd.read_csv('bank.csv')
-data_bank = preprocessData(data_bank)
+# data_bank = pd.read_csv('bank.csv')
+# data_bank = preprocessData(data_bank)
 
 # print data_bank.columns
 # print data_bank['region']
@@ -160,11 +160,11 @@ data_bank = preprocessData(data_bank)
 # print data_bank['region'].values.reshape(-1,1)
 # print len(data_bank['region_0'])
 
-X = data_bank.iloc[:,:data_bank.shape[1]-1]
+# X = data_bank.iloc[:,:data_bank.shape[1]-1]
 # print X
 # print X.cov().shape
 # print data_bank.shape[1]-1
-Y = data_bank['pep']
+# Y = data_bank['pep']
 # print Y
 
 # pep0 =  X.loc[Y == 0,['age','income','children']]
@@ -245,25 +245,25 @@ Y = data_bank['pep']
 
 ########## Exercicio3
 
-# unbalanced_data = pd.read_csv('unbalanced.csv')
-# # unbalanced_data = preprocessData(unbalanced_data)
+unbalanced_data = pd.read_csv('unbalanced.csv')
+unbalanced_data = preprocessData(unbalanced_data)
 
-# X = unbalanced_data.iloc[:,:-1]
-# # print X
-# Y = unbalanced_data['Outcome']
-# # print Y
+X = unbalanced_data.iloc[:,:-1]
+# print X
+Y = unbalanced_data['Outcome']
+print Y
 
-# classifier1 = GaussianNB()
+classifier_NB = GaussianNB()
 
-# classifier2 = KNeighborsClassifier(n_neighbors = 1)
+classifier_Knn1 = KNeighborsClassifier(n_neighbors = 1)
 
-# classifier3 = KNeighborsClassifier(n_neighbors = 10)
+classifier_Knn3 = KNeighborsClassifier(n_neighbors = 3)
 
-# classifier4 = KNeighborsClassifier(n_neighbors = 100)
+classifier_Knn10 = KNeighborsClassifier(n_neighbors = 10)
 
-# roc_curve_func(Y_test,predict,'darkorange')
+classifier4_Knn100 = KNeighborsClassifier(n_neighbors = 100)
 
-# plt.show()
+
 
 
 

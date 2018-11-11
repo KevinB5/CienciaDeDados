@@ -25,3 +25,4 @@ Vídeos:
 Visualizando uma Árvore de Decisão - Receitas de Aprendizado de Máquina #2: https://www.youtube.com/watch?v=tNa99PG8hR8
 Decision Tree Algorithm | Decision Tree in Python | Machine Learning Algorithms | Edureka: https://youtu.be/qDcl-FRnwSU
 Machine Learning 267 k Fold Cross Validation in Python: https://youtu.be/QGygjpBGG20
+Data Science Tutorial | Data Science for Beginners | Data Science with Python Tutorial | Simplilearn: https://youtu.be/jNeUBWrrRsQ

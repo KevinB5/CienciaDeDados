@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import classification_report
 from sklearn import preprocessing
 import numpy as np
 
@@ -87,7 +88,8 @@ def conf_matrix_sens_spec(Y_test,predict):
 
     conf_matrix = confusion_matrix(Y_test,predict)
     tn, fp, fn, tp = confusion_matrix(Y_test,predict).ravel()
-    print 'Confusion Matrix ', conf_matrix
+    print 'Confusion Matrix '
+    print conf_matrix
 
     sensitivity = tp*1./(tp+fn)
     print 'Sensitivity ',sensitivity
@@ -111,7 +113,7 @@ def cross_val(X,Y,classifier,roc_color,title):
 
     accuracies_test = []
     k=0
-
+    print "------------------ "+title+" --------------------"
     #Split the data with k folds for train and the rest to test 
     skf = StratifiedKFold(n_splits = 3, random_state = None, shuffle = True)
     for train_index, test_index in skf.split(X,Y):
@@ -140,7 +142,8 @@ def cross_val(X,Y,classifier,roc_color,title):
 
         k+=1
 
-    print "Accuracy Test -> ",accuracies_test
+    # print "Accuracy Test -> ",accuracies_test
+        print classification_report(Y_test,Y_predict,target_names=['class0','class1'])
 
 
 
@@ -251,7 +254,8 @@ unbalanced_data = preprocessData(unbalanced_data)
 X = unbalanced_data.iloc[:,:-1]
 # print X
 Y = unbalanced_data['Outcome']
-print Y
+# print Y
+print Y.value_counts() #### Ver quantas instancias de cada classe existem
 
 classifier_NB = GaussianNB()
 
@@ -262,6 +266,31 @@ classifier_Knn3 = KNeighborsClassifier(n_neighbors = 3)
 classifier_Knn10 = KNeighborsClassifier(n_neighbors = 10)
 
 classifier4_Knn100 = KNeighborsClassifier(n_neighbors = 100)
+
+# outcome0 =  X.loc[Y == 0,['age','income','children']]
+# # # print pep0
+# outcome0 =  X.loc[Y == 1,['age','income','children']]
+
+plt.figure(figsize = (12,10))
+# plt.subplot(221)
+# plt.scatter(outcome0.iloc[:,0],outcome0.iloc[:,1],color='green')
+# plt.scatter(outcome0.iloc[:,0],outcome0.iloc[:,1],color='blue')
+# plt.title('Bank DataBase')
+# plt.xlabel("Age")
+# plt.ylabel("Income")
+
+# # classifier1 = GaussianNB()
+# # classifier2 = KNeighborsClassifier(n_neighbors = 3)
+
+roc_colors = ['darkorange', 'blue', 'green']
+
+plt.subplot(222)
+cross_val(X,Y,classifier_NB,roc_colors,'Naive_Bayes')
+# plt.show()
+plt.subplot(223)
+cross_val(X,Y,classifier_Knn3,roc_colors,'KNeighborsClassifier')
+
+plt.show()
 
 
 

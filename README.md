@@ -5,6 +5,8 @@ O pré-processamento é um passo importante no processo de mineração de texto.
 
 Albert Einstein once said, "if you judge a fish on its ability to climb a tree, it will live its whole life believing that it is stupid." This quote really highlights the importance of choosing the right evaluation metric.
 
+Para dados unbalanced é necessário ver métricas como AUC, recall, precision, pois da accuracy não se pode tirar conclusões.
+
 Exploration:
 Data exploration is an approach similar to initial data analysis, whereby a data analyst uses visual exploration to understand what is in a dataset and the characteristics of the data, rather than through traditional data management systems[1]. These characteristics can include size or amount of data, completeness of the data, correctness of the data, possible relationships amongst data elements or files/tables in the data.
 

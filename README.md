@@ -35,6 +35,9 @@ Some more examples of popular nonparametric machine learning algorithms are:
 Exemplo:
 https://github.com/rhiever/Data-Analysis-and-Machine-Learning-Projects/blob/master/example-data-science-notebook/Example%20Machine%20Learning%20Notebook.ipynb
 
+Dealing with Imbalanced Data:
+https://www.marcoaltini.com/blog/dealing-with-imbalanced-data-undersampling-oversampling-and-proper-cross-validation
+
 Vídeos:
 Visualizando uma Árvore de Decisão - Receitas de Aprendizado de Máquina #2: https://www.youtube.com/watch?v=tNa99PG8hR8
 Decision Tree Algorithm | Decision Tree in Python | Machine Learning Algorithms | Edureka: https://youtu.be/qDcl-FRnwSU

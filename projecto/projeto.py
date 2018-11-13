@@ -10,6 +10,18 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import seaborn as sb
+import os
+
+
+dir_name =  os.path.dirname(__file__)
+path_test = os.path.normpath('aps_failure/aps_failure_test_set.csv')
+path_train = os.path.normpath('aps_failure/aps_failure_training_set.csv')
+# print os.path.dirname(path)
+path_file1 = os.path.join(os.getcwd(),path_test)
+path_file2 = os.path.join(os.getcwd(),path_train)
+
+aps_test = pd.read_csv(path_file1)
+aps_training = pd.read_csv(path_file2)
 
 #Leitura dos dados Digital Colposcopies
 #green = pd.read_csv('C:/Users/kevin\Documents/GitHub/CienciaDeDados/projecto/Quality Assessment-Digital Colposcopy/green.csv')
@@ -40,21 +52,24 @@ import seaborn as sb
 #print(schiller.head())
 
 #Leitura dos dados APS failure at Scania trucks
-aps_test = pd.read_csv('C:/Users/kevin\Documents/GitHub/CienciaDeDados/projecto/aps_failure/aps_failure_test_set.csv')
-aps_training = pd.read_csv('C:/Users/kevin\Documents/GitHub/CienciaDeDados/projecto/aps_failure/aps_failure_training_set.csv')
+
 
 def delete_trash_columns(dataset,percentage):
     for column in dataset.columns:
         if sum(dataset[column].isnull())/float(len(dataset[column].index)) > percentage:
             dataset.drop([column], axis = 1, inplace = True)
 
-#aps_test = aps_test.replace('neg',np.nan)
-#aps_test = aps_test.replace('pos',np.nan)
-aps_test = aps_test.replace('na',np.nan)
-delete_trash_columns(aps_test,0.45)
+X = aps_test.iloc[:,1:]
+print X
 
-cleanup = {"neg": 0, "pos": 1}
-aps_test.replace(cleanup, inplace = True)
+Y = aps_test.iloc[:,0]
+print Y
+
+aps_replaced = X.replace('na',np.nan)
+delete_trash_columns(aps_replaced,0.45)
+
+
+
 
 def preprocessData(df):
     label_encoder = preprocessing.LabelEncoder()
@@ -83,23 +98,20 @@ def preprocessData(df):
 
 #print(preprocessData(aps_test).head())
 
-col_mean = np.nanmean(aps_test, axis=0,dtype='float64')
-print(col_mean)
 
 def replace_missing_values_mean(dataset):
+    col_mean = np.nanmean(dataset, axis=0,dtype='float64')
+    i = 0
     for column in dataset.columns:
-        print(column)
-        #print('oi')
-        # print(column)
-            
-        #print(np.nanmean(dataset[column],'all'))
-        #column_mean = np.nanmean(dataset[column])
-        #print(column_mean)
-        #dataset[column] = dataset[column].replace(np.nan,column_mean)
+        #print(col_mean.shape)
+        #print(dataset.shape)
+        dataset[column] = dataset[column].fillna(col_mean[i]) 
+        i=i+1   
+    return dataset
 
-#aps_test = replace_missing_values_mean(aps_test)
+#aps_test = replace_missing_values_mean(aps_replaced)
 
-#print(aps_test)
+print(aps_test)
 
 
 

@@ -9,6 +9,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import classification_report
 from sklearn import preprocessing
+from sklearn.utils import resample
 import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -112,6 +113,7 @@ def roc_curve_func(Y_test,predict,roc_color,title):
 def cross_val(X,Y,classifier,roc_color,title):
 
     accuracies_test = []
+    accuracies_train = []
     k=0
     print "------------------ "+title+" --------------------"
     #Split the data with k folds for train and the rest to test 
@@ -123,13 +125,19 @@ def cross_val(X,Y,classifier,roc_color,title):
         model = classifier.fit(X_train,Y_train)
         #Prediction  
         Y_predict = model.predict(X_test)
+        #Prediction
+        YX_predict = model.predict(X_train)
         #Plot the model
         # plt_Prediction_Cross_Validation(Y_test,Y_predict,k)
         #Accuracy
         accuracy_test = accuracy_score(Y_test, Y_predict)
         #Put all accuricies in array to calculate mean accuracy
         accuracies_test.append(accuracy_test)
-        #Count KFold
+
+        accuracy_train = accuracy_score(Y_train, YX_predict)
+        #Put all accuricies in array to calculate mean accuracy
+        accuracies_train.append(accuracy_train)
+        
         
         #Calculate Confusion Matrix
         # conf_matrix = confusion_matrix(Y_test, Y_predict)
@@ -139,7 +147,7 @@ def cross_val(X,Y,classifier,roc_color,title):
         conf_matrix_sens_spec(Y_test,Y_predict)
 
         roc_curve_func(Y_test,Y_predict,roc_color[k],title)
-
+        #Count KFold    
         k+=1
 
     # print "Accuracy Test -> ",accuracies_test
@@ -147,9 +155,58 @@ def cross_val(X,Y,classifier,roc_color,title):
 
 
 
-    return np.mean(accuracies_test),np.std(accuracies_test)
+    return accuracies_test,np.std(accuracies_test),accuracies_train,np.std(accuracies_train)
+
+def separate_data(df,Y,major):
+
+    # df_majority = new DataFrame()
+    # df_minority = new DataFrame()
+
+    if(major == 1):
+        df_majority = df[Y==1]
+        df_minority = df[Y==0]
+    else:
+        df_majority = df[Y==0]
+        df_minority = df[Y==1]
+
+    return df_majority,df_minority
+        
+
+def balance_data(df,Y,major,replace):
+
+    df_majority, df_minority = separate_data(df,Y,major)
+
+    # print df_majority
+
+    if(replace==True):
+        df_minority = resample(df_minority,replace=replace,n_samples=len(df_majority),random_state=123)
+    else:
+        df_majority = resample(df_majority,replace=replace,n_samples=len(df_minority),random_state=123)
+
+    df = pd.concat([df_minority, df_majority])
+    df = df.reset_index()
+    df = df.drop(['index'],axis=1)
+
+    return df
 
 
+def compare_classifiers(X,Y,roc_colors,classifiers,classifier_names):
+
+    plt.figure(figsize = (12,10))
+    k = 1
+    for i in range(len(classifiers)):
+        
+        plt.subplot(220+i+k)
+        crossval_class = cross_val(X,Y,classifiers[i],roc_colors,classifier_names[i])
+        plt.subplot(220+i+k+1)
+        plt.boxplot([crossval_class[0],crossval_class[2]])
+        k=k+1
+        print "Accuracy Test"
+        print crossval_class[0], crossval_class[1]
+        print "Accuracy Train"
+        print crossval_class[2], crossval_class[3]
+
+    plt.show()
 
 
 # data_bank = pd.read_csv('bank.csv')
@@ -250,12 +307,26 @@ def cross_val(X,Y,classifier,roc_color,title):
 
 unbalanced_data = pd.read_csv('unbalanced.csv')
 unbalanced_data = preprocessData(unbalanced_data)
+# print unbalanced_data.isnan()
+balanced_data = balance_data(unbalanced_data,unbalanced_data['Outcome'],1,False)
+# print balanced_data.isnan()
+# print np.any(np.isnan(balanced_data))
+# print np.all(np.isfinite(balanced_data))
+
+# print balanced_data
 
 X = unbalanced_data.iloc[:,:-1]
-# print X
+# print X.iloc[:24]
 Y = unbalanced_data['Outcome']
-# print Y
-print Y.value_counts() #### Ver quantas instancias de cada classe existem
+# # print Y
+# print Y.value_counts() #### Ver quantas instancias de cada classe existem
+
+X_balanced = balanced_data.iloc[:,:-1]
+# print X_balanced
+# print X_balanced == X.iloc[:,:24]
+# print len(X.iloc[:24])
+Y_balanced = balanced_data['Outcome']
+print Y_balanced.value_counts()
 
 classifier_NB = GaussianNB()
 
@@ -271,7 +342,7 @@ classifier4_Knn100 = KNeighborsClassifier(n_neighbors = 100)
 # # # print pep0
 # outcome0 =  X.loc[Y == 1,['age','income','children']]
 
-plt.figure(figsize = (12,10))
+# plt.figure(figsize = (12,10))
 # plt.subplot(221)
 # plt.scatter(outcome0.iloc[:,0],outcome0.iloc[:,1],color='green')
 # plt.scatter(outcome0.iloc[:,0],outcome0.iloc[:,1],color='blue')
@@ -279,30 +350,29 @@ plt.figure(figsize = (12,10))
 # plt.xlabel("Age")
 # plt.ylabel("Income")
 
-# # classifier1 = GaussianNB()
-# # classifier2 = KNeighborsClassifier(n_neighbors = 3)
-
 roc_colors = ['darkorange', 'blue', 'green']
+classifiers_names = ['Naive_Bayes','1 - NeighborsClassifier','3 - NeighborsClassifier', '10 - NeighborsClassifier', '100 - NeighborsClassifier']
 
-plt.subplot(222)
-cross_val(X,Y,classifier_NB,roc_colors,'Naive_Bayes')
+compare_classifiers(X_balanced,Y_balanced,roc_colors,[classifier_NB,classifier_Knn3],classifiers_names)
+
+# plt.subplot(221)
+# crossval_NB = cross_val(X_balanced,Y_balanced,classifier_NB,roc_colors,'Naive_Bayes')
+# plt.subplot(222)
+# plt.boxplot([crossval_NB[0],crossval_NB[2]])
+
+# print "Accuracy Test"
+# print crossval_NB[0], crossval_NB[1]
+# print "Accuracy Train"
+# print crossval_NB[2], crossval_NB[3]
+# # plt.show()
+# plt.subplot(223)
+# crossval_Knn = cross_val(X_balanced,Y_balanced,classifier_Knn3,roc_colors,'KNeighborsClassifier')
+# plt.subplot(224)
+# plt.boxplot([crossval_Knn[0],crossval_Knn[2]])
+
+# print "Accuracy Test"
+# print crossval_Knn[0], crossval_Knn[1]
+# print "Accuracy Train"
+# print crossval_Knn[2], crossval_Knn[3]
+
 # plt.show()
-plt.subplot(223)
-cross_val(X,Y,classifier_Knn3,roc_colors,'KNeighborsClassifier')
-
-plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import itertools
+from scipy import stats
 
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedKFold
@@ -13,6 +14,10 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+#######LINKS IMPORTANTES
+# #https://www.statisticshowto.datasciencecentral.com/probability-and-statistics/t-test/
+# #https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html
 
 
 def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm.Blues):
@@ -74,26 +79,31 @@ def split_train_test(X,Y,classifier):
     X_train,X_test,Y_train,Y_test = train_test_split(X,Y, train_size = 0.8)
     #Trainning the model
     model = classifier.fit(X_train,Y_train)
-    #Predicao  
+    #Prediction
     Y_predict = model.predict(X_test)
+    #Prediction
+    YX_predict = model.predict(X_train)
     #Plot the model
     # plt_Prediction_Train_Test_Split(Y_test,Y_predict)
     #Accuracy
     accuracy_test = accuracy_score(Y_test, Y_predict)
+    #Accuracy
+    accuracy_train = accuracy_score(Y_train, YX_predict)
     #Calculate Confusion MAtrix
     conf_matrix =  confusion_matrix(Y_test, Y_predict)
     #show Confusion Matrix
     # plot_confusion_matrix(conf_matrix,classes)
 
-    return accuracy_test
+    return accuracy_test,accuracy_train
 
 def cross_val(X,Y,classifier,splits):
 
     accuracies_test = []
+    accuracies_train = []
     k=1
 
     #Split the data with 10 folds for train and the rest to test 
-    skf = StratifiedKFold(n_splits = splits, random_state = None, shuffle = True)
+    skf = StratifiedKFold(n_splits = splits, random_state = 0, shuffle = True)
     for train_index, test_index in skf.split(X,Y):
         X_train, X_test = X.loc[train_index], X.loc[test_index]
         Y_train, Y_test = Y.loc[train_index], Y.loc[test_index]
@@ -101,20 +111,33 @@ def cross_val(X,Y,classifier,splits):
         model = classifier.fit(X_train,Y_train)
         #Prediction  
         Y_predict = model.predict(X_test)
+        #Prediction
+        YX_predict = model.predict(X_train)
         #Plot the model
         # plt_Prediction_Cross_Validation(Y_test,Y_predict,k)
         #Accuracy
         accuracy_test = accuracy_score(Y_test, Y_predict)
         #Put all accuricies in array to calculate mean accuracy
         accuracies_test.append(accuracy_test)
+        #Accuracy
+        accuracy_train = accuracy_score(Y_train, YX_predict)
+        #Put all accuricies in array to calculate mean accuracy
+        accuracies_train.append(accuracy_train)
         #Count KFold
         k+=1
         #Calculate Confusion Matrix
         conf_matrix = confusion_matrix(Y_test, Y_predict)
         #Show Confusion Matrix
         # plot_confusion_matrix(conf_matrix,classes)
+        # print t_test(accuracies_train,accuracies_test)[1]
 
-    return np.mean(accuracies_test),np.std(accuracies_test)
+    return accuracies_test,np.std(accuracies_test),accuracies_train,np.std(accuracies_train)
+
+def t_test(score_train,score_test):
+
+    return stats.ttest_ind(score_train,score_test)
+
+
 
 # def cross_val_2(X,Y,classifier):
 
@@ -133,57 +156,38 @@ def cross_val(X,Y,classifier,splits):
 #     return np.mean(accuracy)
 
 
-######### Para saber os FP e FN de uma classe considerada verdadeira,
-######### para o exercicio 1 -> Iris-Virginica
-# def fp_fn_class(Y_test,predict,i_class,classes):
-
-#     class_true = classes[i_class]
-#     classes = np.delete(classes,i_class)
-
-#     vir_size = Y_test==class_true
-#     TP_vir = Y_test[predict==class_true] == class_true
-
-#     # print np.sum(vir_size)
-#     # print np.sum(TP_vir)
-
-#     FP_0 = Y_test[predict==classes[0]] == class_true
-#     FP_1 = Y_test[predict==classes[1]] == class_true
-
-#     # print 'Falsos POsitivos VIR SET ',np.sum(FP_vir_set)
-#     # print 'Falsos POsitivos VIR VER ',np.sum(FP_vir_ver)
-
-#     FN_0 = Y_test[predict==class_true] == classes[0]
-#     FN_1 = Y_test[predict==class_true] == classes[1]
-
-#     # print 'Falsos Negativos VIR SET ',np.sum(FN_vir_set)
-#     # print 'Falsos Negativos VIR VER ',np.sum(FN_vir_ver)
-
-#     n_FP = np.sum(FP_0)+np.sum(FP_1)
-#     n_FN = np.sum(FN_0)+np.sum(FN_1)
-
-#     return n_FP, n_FN
-
-
 def exercise_1(X,Y,neighbors):
 
     #Instanciar o modelo de apredizagem com 3 neighbors (k = 3)
     knn = KNeighborsClassifier(n_neighbors = neighbors)
     # Accuracy train_test_split
-    print "Accuracy Test KNN splliting data with train_test =",split_train_test(X,Y,knn)
+    print "Accuracy Test KNN splliting data with train_test =",split_train_test(X,Y,knn)[0]
+    # Accuracy train_test_split
+    print "Accuracy Train KNN splliting data with train_test =",split_train_test(X,Y,knn)[1]
     # Accuracy StratifiedKFold
     print "Accuracy Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn,splits)[0]
     # Standart desviation StratifiedKFold
     print "Standart desviation Test KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn,splits)[1]
+    # Accuracy StratifiedKFold
+    print "Accuracy Train KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn,splits)[2]
+    # Standart desviation StratifiedKFold
+    print "Standart desviation Train KNN splliting data with StratifiedKFold =",cross_val(X,Y,knn,splits)[3]
 
 def exercise_2(X,Y):
     #Instanciar o modelo de apredizagem com Naive Bayes
     nb = GaussianNB()
     # Accuracy train_test_split
-    print "Accuracy Test Naive Bayes splliting data with train_test =",split_train_test(X,Y,nb)
+    print "Accuracy Test Naive Bayes splliting data with train_test =",split_train_test(X,Y,nb)[0]
+    # Accuracy train_test_split
+    print "Accuracy Train Naive Bayes splliting data with train_test =",split_train_test(X,Y,nb)[1]
     # Accuracy StratifiedKFold
     print "Accuracy Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[0]
     # Standart desviation StratifiedKFold
     print "Standart desviation Test Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[1]
+    # Accuracy StratifiedKFold
+    print "Accuracy Train Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[2]
+    # Standart desviation StratifiedKFold
+    print "Standart desviation Train Naive Bayes splliting data with StratifiedKFold =",cross_val(X,Y,nb,splits)[3]
 
 def exercise_3(X,Y,neighbors):
 
@@ -219,27 +223,23 @@ def exercise_4(X,Y):
 
 
 ##########################################################################################
+# Com 10 folds verificamos que existe overfiting por isso e necessario diminuir os folds
+# O ideal sera k=3
 
-splits = 10
+splits = 5
 
-# #Leitura dos dados
+#Leitura dos dados
 iris = pd.read_csv('iris.csv')
-# #Instancias 
+#Instancias 
 X = iris.iloc[:,:4]
-# #Classe correspondente aos dados
+#Classe correspondente aos dados
 Y = iris['class']
-# #Classes existentes
-# classes = np.unique(Y)
+#Classes existentes
+classes = np.unique(Y)
 
-# exercise_1(X,Y,3)
-# print ' '
-# exercise_2(X,Y)
-
-# Apos o exercicio 1 e 2, concluimos que entre o classificador Knn e Naive Bayes obtemos prestações parecidas pois
-# a distribuição dos dados da base de dados Iris não tem muita sobreposição entre classes, tendo ambos os classificadores boas accuracy
-# Caso a base de dados tivesse mais sobreposição, o melhor classificador na teoria seria o Knn
-
-##########################################################################################
+exercise_1(X,Y,3)
+print ' '
+exercise_2(X,Y)
 
 # idx_virg = np.argwhere(Y=='Iris-virginica')
 # print idx_virg
@@ -273,6 +273,6 @@ Y = iris['class']
 # classes = np.unique(Y)
 
 # print "Splits =",splits
-# exercise_3(X,Y,[1,5,10,15,50,100])
+# exercise_3(X,Y,neighbors)
 # print ' '
 # exercise_4(X,Y)

@@ -59,18 +59,6 @@ def delete_trash_columns(dataset,percentage):
         if sum(dataset[column].isnull())/float(len(dataset[column].index)) > percentage:
             dataset.drop([column], axis = 1, inplace = True)
 
-X = aps_test.iloc[:,1:]
-print X
-
-Y = aps_test.iloc[:,0]
-print Y
-
-aps_replaced = X.replace('na',np.nan)
-delete_trash_columns(aps_replaced,0.45)
-
-
-
-
 def preprocessData(df):
     label_encoder = preprocessing.LabelEncoder()
     dummy_encoder = preprocessing.OneHotEncoder()
@@ -96,20 +84,29 @@ def preprocessData(df):
             pdf = pd.concat([pdf, temp], axis=1)
     return pdf
 
-#print(preprocessData(aps_test).head())
+
 
 
 def replace_missing_values_mean(dataset):
     col_mean = np.nanmean(dataset, axis=0,dtype='float64')
     i = 0
     for column in dataset.columns:
-        #print(col_mean.shape)
-        #print(dataset.shape)
         dataset[column] = dataset[column].fillna(col_mean[i]) 
         i=i+1   
     return dataset
 
-#aps_test = replace_missing_values_mean(aps_replaced)
+X = aps_test.iloc[:,1:]
+print X
+
+Y = aps_test.iloc[:,0]
+print Y
+
+aps_replaced = X.replace('na',np.nan)
+delete_trash_columns(aps_replaced,0.45)
+
+#print(preprocessData(aps_test).head())
+
+aps_test = replace_missing_values_mean(aps_replaced)
 
 print(aps_test)
 

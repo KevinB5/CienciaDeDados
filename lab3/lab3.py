@@ -10,6 +10,7 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.metrics import classification_report
 from sklearn import preprocessing
 from sklearn.utils import resample
+from imblearn.over_sampling import SMOTE
 import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -192,14 +193,14 @@ def balance_data(df,Y,major,replace):
 
 def compare_classifiers(X,Y,roc_colors,classifiers,classifier_names):
 
-    plt.figure(figsize = (12,10))
+    plt.figure(figsize = (6*(len(classifiers)),5*(len(classifiers))))
     k = 1
     for i in range(len(classifiers)):
         
-        plt.subplot(220+i+k)
+        plt.subplot((110*len(classifiers))+i+k)
         crossval_class = cross_val(X,Y,classifiers[i],roc_colors,classifier_names[i])
-        plt.subplot(220+i+k+1)
-        plt.boxplot([crossval_class[0],crossval_class[2]])
+        plt.subplot((110*len(classifiers))+i+k+1)
+        plt.boxplot([crossval_class[0],crossval_class[2]],positions=[0,1],widths=0.6)
         k=k+1
         print "Accuracy Test"
         print crossval_class[0], crossval_class[1]
@@ -353,7 +354,7 @@ classifier4_Knn100 = KNeighborsClassifier(n_neighbors = 100)
 roc_colors = ['darkorange', 'blue', 'green']
 classifiers_names = ['Naive_Bayes','1 - NeighborsClassifier','3 - NeighborsClassifier', '10 - NeighborsClassifier', '100 - NeighborsClassifier']
 
-compare_classifiers(X_balanced,Y_balanced,roc_colors,[classifier_NB,classifier_Knn3],classifiers_names)
+compare_classifiers(X,Y,roc_colors,[classifier_NB,classifier_Knn3, classifier_Knn10],classifiers_names)
 
 # plt.subplot(221)
 # crossval_NB = cross_val(X_balanced,Y_balanced,classifier_NB,roc_colors,'Naive_Bayes')

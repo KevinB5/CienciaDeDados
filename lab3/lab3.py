@@ -354,7 +354,7 @@ classifier4_Knn100 = KNeighborsClassifier(n_neighbors = 100)
 roc_colors = ['darkorange', 'blue', 'green']
 classifiers_names = ['Naive_Bayes','1 - NeighborsClassifier','3 - NeighborsClassifier', '10 - NeighborsClassifier', '100 - NeighborsClassifier']
 
-compare_classifiers(X,Y,roc_colors,[classifier_NB,classifier_Knn3, classifier_Knn10],classifiers_names)
+compare_classifiers(X_balanced,Y_balanced,roc_colors,[classifier_NB,classifier_Knn3, classifier_Knn10],classifiers_names)
 
 # plt.subplot(221)
 # crossval_NB = cross_val(X_balanced,Y_balanced,classifier_NB,roc_colors,'Naive_Bayes')

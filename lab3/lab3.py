@@ -190,9 +190,23 @@ def balance_data(df,Y,major,replace):
     return df
 
 
-    
+def compare_classifiers(X,Y,roc_colors,classifiers,classifier_names):
 
+    plt.figure(figsize = (12,10))
+    k = 1
+    for i in range(len(classifiers)):
+        
+        plt.subplot(220+i+k)
+        crossval_class = cross_val(X,Y,classifiers[i],roc_colors,classifier_names[i])
+        plt.subplot(220+i+k+1)
+        plt.boxplot([crossval_class[0],crossval_class[2]])
+        k=k+1
+        print "Accuracy Test"
+        print crossval_class[0], crossval_class[1]
+        print "Accuracy Train"
+        print crossval_class[2], crossval_class[3]
 
+    plt.show()
 
 
 # data_bank = pd.read_csv('bank.csv')
@@ -307,7 +321,7 @@ Y = unbalanced_data['Outcome']
 # # print Y
 # print Y.value_counts() #### Ver quantas instancias de cada classe existem
 
-X_balanced = balanced_data.iloc[:,:-1] 
+X_balanced = balanced_data.iloc[:,:-1]
 # print X_balanced
 # print X_balanced == X.iloc[:,:24]
 # print len(X.iloc[:24])
@@ -328,7 +342,7 @@ classifier4_Knn100 = KNeighborsClassifier(n_neighbors = 100)
 # # # print pep0
 # outcome0 =  X.loc[Y == 1,['age','income','children']]
 
-plt.figure(figsize = (12,10))
+# plt.figure(figsize = (12,10))
 # plt.subplot(221)
 # plt.scatter(outcome0.iloc[:,0],outcome0.iloc[:,1],color='green')
 # plt.scatter(outcome0.iloc[:,0],outcome0.iloc[:,1],color='blue')
@@ -336,45 +350,29 @@ plt.figure(figsize = (12,10))
 # plt.xlabel("Age")
 # plt.ylabel("Income")
 
-# # classifier1 = GaussianNB()
-# # classifier2 = KNeighborsClassifier(n_neighbors = 3)
-
 roc_colors = ['darkorange', 'blue', 'green']
+classifiers_names = ['Naive_Bayes','1 - NeighborsClassifier','3 - NeighborsClassifier', '10 - NeighborsClassifier', '100 - NeighborsClassifier']
 
-plt.subplot(221)
-crossval_NB = cross_val(X_balanced,Y_balanced,classifier_NB,roc_colors,'Naive_Bayes')
-plt.subplot(222)
-plt.boxplot(crossval_NB[0])
-plt.boxplot(crossval_NB[2])
-print "Accuracy Test"
-print crossval_NB[0], crossval_NB[1]
-print "Accuracy Train"
-print crossval_NB[2], crossval_NB[3]
+compare_classifiers(X_balanced,Y_balanced,roc_colors,[classifier_NB,classifier_Knn3],classifiers_names)
+
+# plt.subplot(221)
+# crossval_NB = cross_val(X_balanced,Y_balanced,classifier_NB,roc_colors,'Naive_Bayes')
+# plt.subplot(222)
+# plt.boxplot([crossval_NB[0],crossval_NB[2]])
+
+# print "Accuracy Test"
+# print crossval_NB[0], crossval_NB[1]
+# print "Accuracy Train"
+# print crossval_NB[2], crossval_NB[3]
+# # plt.show()
+# plt.subplot(223)
+# crossval_Knn = cross_val(X_balanced,Y_balanced,classifier_Knn3,roc_colors,'KNeighborsClassifier')
+# plt.subplot(224)
+# plt.boxplot([crossval_Knn[0],crossval_Knn[2]])
+
+# print "Accuracy Test"
+# print crossval_Knn[0], crossval_Knn[1]
+# print "Accuracy Train"
+# print crossval_Knn[2], crossval_Knn[3]
+
 # plt.show()
-plt.subplot(223)
-crossval_Knn = cross_val(X_balanced,Y_balanced,classifier_Knn3,roc_colors,'KNeighborsClassifier')
-plt.subplot(224)
-plt.boxplot(crossval_NB[0])
-plt.boxplot(crossval_NB[2])
-print "Accuracy Test"
-print crossval_NB[0], crossval_NB[1]
-print "Accuracy Train"
-print crossval_NB[2], crossval_NB[3]
-
-
-plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -158,6 +158,53 @@ def cross_val(X,Y,classifier,roc_color,title):
 
     return accuracies_test,np.std(accuracies_test),accuracies_train,np.std(accuracies_train)
 
+def cross_val2(X,Y,classifier,roc_color,title):
+
+    accuracies_test = []
+    accuracies_train = []
+    k=0
+    print "------------------ "+title+" --------------------"
+    #Split the data with k folds for train and the rest to test 
+    skf = StratifiedKFold(n_splits = 3, random_state = None, shuffle = True)
+    for train_index, test_index in skf.split(X,Y):
+        X_train, X_test = X[train_index], X[test_index]
+        Y_train, Y_test = Y[train_index], Y[test_index]
+        #Trainning the model
+        model = classifier.fit(X_train,Y_train)
+        #Prediction  
+        Y_predict = model.predict(X_test)
+        #Prediction
+        YX_predict = model.predict(X_train)
+        #Plot the model
+        # plt_Prediction_Cross_Validation(Y_test,Y_predict,k)
+        #Accuracy
+        accuracy_test = accuracy_score(Y_test, Y_predict)
+        #Put all accuricies in array to calculate mean accuracy
+        accuracies_test.append(accuracy_test)
+
+        accuracy_train = accuracy_score(Y_train, YX_predict)
+        #Put all accuricies in array to calculate mean accuracy
+        accuracies_train.append(accuracy_train)
+        
+        
+        #Calculate Confusion Matrix
+        # conf_matrix = confusion_matrix(Y_test, Y_predict)
+        #Show Confusion Matrix
+        # plot_confusion_matrix(conf_matrix,classes)
+
+        conf_matrix_sens_spec(Y_test,Y_predict)
+
+        roc_curve_func(Y_test,Y_predict,roc_color[k],title)
+        #Count KFold    
+        k+=1
+
+    # print "Accuracy Test -> ",accuracies_test
+        print classification_report(Y_test,Y_predict,target_names=['class0','class1'])
+
+
+
+    return accuracies_test,np.std(accuracies_test),accuracies_train,np.std(accuracies_train)
+
 def separate_data(df,Y,major):
 
     # df_majority = new DataFrame()
@@ -190,6 +237,12 @@ def balance_data(df,Y,major,replace):
 
     return df
 
+def balance_SMOTE(X,Y):
+
+    sm = SMOTE(random_state=12, ratio = 1.0)
+    x_train_res, y_train_res = sm.fit_sample(X,Y)
+
+    return x_train_res, y_train_res
 
 def compare_classifiers(X,Y,roc_colors,classifiers,classifier_names):
 
@@ -198,7 +251,7 @@ def compare_classifiers(X,Y,roc_colors,classifiers,classifier_names):
     for i in range(len(classifiers)):
         
         plt.subplot((110*len(classifiers))+i+k)
-        crossval_class = cross_val(X,Y,classifiers[i],roc_colors,classifier_names[i])
+        crossval_class = cross_val2(X,Y,classifiers[i],roc_colors,classifier_names[i])
         plt.subplot((110*len(classifiers))+i+k+1)
         plt.boxplot([crossval_class[0],crossval_class[2]],positions=[0,1],widths=0.6)
         k=k+1
@@ -309,12 +362,6 @@ def compare_classifiers(X,Y,roc_colors,classifiers,classifier_names):
 unbalanced_data = pd.read_csv('unbalanced.csv')
 unbalanced_data = preprocessData(unbalanced_data)
 # print unbalanced_data.isnan()
-balanced_data = balance_data(unbalanced_data,unbalanced_data['Outcome'],1,False)
-# print balanced_data.isnan()
-# print np.any(np.isnan(balanced_data))
-# print np.all(np.isfinite(balanced_data))
-
-# print balanced_data
 
 X = unbalanced_data.iloc[:,:-1]
 # print X.iloc[:24]
@@ -322,12 +369,25 @@ Y = unbalanced_data['Outcome']
 # # print Y
 # print Y.value_counts() #### Ver quantas instancias de cada classe existem
 
-X_balanced = balanced_data.iloc[:,:-1]
-# print X_balanced
-# print X_balanced == X.iloc[:,:24]
-# print len(X.iloc[:24])
-Y_balanced = balanced_data['Outcome']
-print Y_balanced.value_counts()
+# balanced_data = balance_data(unbalanced_data,unbalanced_data['Outcome'],1,True)
+# print balanced_data.isnan()
+# print np.any(np.isnan(balanced_data))
+# print np.all(np.isfinite(balanced_data))
+
+# print balanced_data
+
+# X_balanced = balanced_data.iloc[:,:-1]
+# # print X_balanced
+# # print X_balanced == X.iloc[:,:24]
+# # print len(X.iloc[:24])
+# Y_balanced = balanced_data['Outcome']
+# print Y_balanced.value_counts()
+
+
+X_balanced,Y_balanced = balance_SMOTE(X,Y)
+
+
+
 
 classifier_NB = GaussianNB()
 

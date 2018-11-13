@@ -28,7 +28,7 @@ aps_training = pd.read_csv(path_file2)
 #hinselmann = pd.read_csv('C:/Users/kevin\Documents/GitHub/CienciaDeDados/projecto/Quality Assessment-Digital Colposcopy/hinselmann.csv')
 #schiller = pd.read_csv('C:/Users/kevin\Documents/GitHub/CienciaDeDados/projecto/Quality Assessment-Digital Colposcopy/schiller.csv')
 
-#Verificar se o formato é utilizável 
+#Verificar se o formato e utilizavel 
 #green.head()
 #hinselmann.head()
 #schiller.head()
@@ -53,11 +53,6 @@ aps_training = pd.read_csv(path_file2)
 
 #Leitura dos dados APS failure at Scania trucks
 
-
-def delete_trash_columns(dataset,percentage):
-    for column in dataset.columns:
-        if sum(dataset[column].isnull())/float(len(dataset[column].index)) > percentage:
-            dataset.drop([column], axis = 1, inplace = True)
 
 def preprocessData(df):
     label_encoder = preprocessing.LabelEncoder()
@@ -84,8 +79,10 @@ def preprocessData(df):
             pdf = pd.concat([pdf, temp], axis=1)
     return pdf
 
-
-
+def delete_trash_columns(dataset,percentage):
+    for column in dataset.columns:
+        if sum(dataset[column].isnull())/float(len(dataset[column].index)) > percentage:
+            dataset.drop([column], axis = 1, inplace = True)
 
 def replace_missing_values_mean(dataset):
     col_mean = np.nanmean(dataset, axis=0,dtype='float64')
@@ -94,6 +91,40 @@ def replace_missing_values_mean(dataset):
         dataset[column] = dataset[column].fillna(col_mean[i]) 
         i=i+1   
     return dataset
+
+def separate_data(df,Y,major):
+
+    # df_majority = new DataFrame()
+    # df_minority = new DataFrame()
+
+    if(major == 1):
+        df_majority = df[Y==1]
+        df_minority = df[Y==0]
+    else:
+        df_majority = df[Y==0]
+        df_minority = df[Y==1]
+
+    return df_majority,df_minority
+        
+
+def balance_data(df,Y,major,replace):
+
+    df_majority, df_minority = separate_data(df,Y,major)
+
+    # print df_majority
+
+    if(replace==True):
+        df_minority = resample(df_minority,replace=replace,n_samples=len(df_majority),random_state=123)
+    else:
+        df_majority = resample(df_majority,replace=replace,n_samples=len(df_minority),random_state=123)
+
+    df = pd.concat([df_minority, df_majority])
+    df = df.reset_index()
+    df = df.drop(['index'],axis=1)
+
+    return df
+
+
 
 X = aps_test.iloc[:,1:]
 print X

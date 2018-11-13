@@ -253,7 +253,7 @@ def compare_classifiers(X,Y,roc_colors,classifiers,classifier_names):
         plt.subplot((110*len(classifiers))+i+k)
         crossval_class = cross_val2(X,Y,classifiers[i],roc_colors,classifier_names[i])
         plt.subplot((110*len(classifiers))+i+k+1)
-        plt.boxplot([crossval_class[0],crossval_class[2]],positions=[0,1],widths=0.5)
+        plt.boxplot([crossval_class[0],crossval_class[2]],positions=[0,1],widths=0.6)
         k=k+1
         print "Accuracy Test"
         print crossval_class[0], crossval_class[1]

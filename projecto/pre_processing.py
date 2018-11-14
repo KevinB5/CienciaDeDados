@@ -35,6 +35,8 @@ def delete_trash_columns(dataset,percentage):
         if sum(dataset[column].isnull())/float(len(dataset[column].index)) > percentage:
             dataset.drop([column], axis = 1, inplace = True)
 
+
+
 def replace_missing_values_mean(dataset):
     col_mean = np.nanmean(dataset, axis=0,dtype='float64')
     i = 0
@@ -92,7 +94,7 @@ def balance_SMOTE(X,Y):
 
     return x_train_res, y_train_res
 
-def pre_processing(X,Y,major,replace,percentage=0.5,dummies=1,delete_columns=1,replace_na=1,normalize=0,balance_data=0,balance_SMOTE=0):
+def pre_processing(X,Y,major,replace,percentage=0.5,dummies=1,delete_columns=1,duplicate=1,replace_na=1,normalize=0,balance_data=0,balance_SMOTE=0):
 
 	X_aux = X
 	y_aux = Y
@@ -107,6 +109,15 @@ def pre_processing(X,Y,major,replace,percentage=0.5,dummies=1,delete_columns=1,r
 	if(delete_columns):
 
 		delete_trash_columns(X_aux)
+
+	if(duplicate):
+
+		df_aux = pd.concat((y_aux,X_aux),axis=1)
+		df_aux.drop_duplicates()
+		#APS
+		X_aux = df_aux.iloc[:,1:]
+		y_aux = df_aux.iloc[:,0]
+
 
 	if(replace_na):
 

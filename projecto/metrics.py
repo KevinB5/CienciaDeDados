@@ -1,5 +1,6 @@
 import numpy as np
-from sklearn.metrics import accuracy_score,confusion_matrix,classification_report
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score,confusion_matrix,classification_report,roc_curve, auc
 
 accuracies = []
 errors = []

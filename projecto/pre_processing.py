@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn import preprocessing
 from sklearn.utils import resample
 from imblearn.over_sampling import SMOTE
+from scipy.stats import zscore
 
 def preprocessData(df):
     label_encoder = preprocessing.LabelEncoder()
@@ -41,6 +42,16 @@ def replace_missing_values_mean(dataset):
         dataset[column] = dataset[column].fillna(col_mean[i]) 
         i=i+1   
     return dataset
+
+def z_score(X):
+
+	return X.apply(zscore)
+
+def min_max(X):
+
+	min_max = preprocessing.MinMaxScaler()
+
+	return min_max.fit_transform(X)
 
 def separate_data(df,Y,major):
 
@@ -81,7 +92,7 @@ def balance_SMOTE(X,Y):
 
     return x_train_res, y_train_res
 
-def pre_processing(X,Y,major,replace,percentage,dummies,delete_columns,replace_na,balance_data,balance_SMOTE):
+def pre_processing(X,Y,major,replace,percentage=0.5,dummies=1,delete_columns=1,replace_na=1,normalize=0,balance_data=0,balance_SMOTE=0):
 
 	X_aux = X
 	y_aux = Y
@@ -96,14 +107,19 @@ def pre_processing(X,Y,major,replace,percentage,dummies,delete_columns,replace_n
 
 	if(replace_na):
 
-		Xaux = replace_missing_values_mean(X_aux)
+		X_aux = replace_missing_values_mean(X_aux)
+
+	if(normalize):
+		X_aux = z_score(X_aux)
+	else:
+		X_aux = min_max(X_aux)
 
 	if(balance_data):
  
 		df_aux = pd.concat((y_aux,X_aux),axis=1)
 		df_aux = balance_data(df_aux,y_aux,major,replace)
 		#APS
-		Xaux = df_aux.iloc[:,1:]
+		X_aux = df_aux.iloc[:,1:]
 		y_aux = df_aux.iloc[:,0]
 
 	if(balance_SMOTE):

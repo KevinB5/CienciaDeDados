@@ -20,6 +20,8 @@ Albert Einstein once said, "if you judge a fish on its ability to climb a tree, 
 
 Para dados unbalanced é necessário ver métricas como AUC, recall, precision, pois da accuracy não se pode tirar conclusões.
 
+O Pré-Processamento tem que ser feito durante o cross-validation.
+
 Exploration:
 Data exploration is an approach similar to initial data analysis, whereby a data analyst uses visual exploration to understand what is in a dataset and the characteristics of the data, rather than through traditional data management systems[1]. These characteristics can include size or amount of data, completeness of the data, correctness of the data, possible relationships amongst data elements or files/tables in the data.
 

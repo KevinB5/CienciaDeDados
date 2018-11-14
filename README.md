@@ -1,4 +1,7 @@
 ﻿# CienciaDeDados
+ 
+DataSet DC:
+A escolha da target variable passa por pre processar os dados, mas sem balance pois cada expert pode ter classificado mais resultados como bons e não maus, mas não invalida que esteja errado. Temos de ver a accuracy ou auc para escolher qual as melhores target_variables, e ver se ao concatenar experts temos um melhor consensus.
 
 Pré-Processamento:
 O pré-processamento é um passo importante no processo de mineração de texto. A frase "garbage in, garbage out" é particularmente aplicável a projetos de data mining e machine learning. Os métodos de coleta de dados geralmente são frouxamente controlados, resultando em valores de intervalo out-of-range (por exemplo, renda: −100),  combinações de dados impossíveis (por exemplo, sexo: masculino, grávidas: sim), missing values, etc. A análise de dados que não foram cuidadosamente selecionados para tais problemas pode produzir resultados enganosos. Assim, a representação e a qualidade dos dados são antes de tudo uma análise.

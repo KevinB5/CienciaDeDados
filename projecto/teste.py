@@ -19,9 +19,8 @@ Y = aps_test.iloc[:,0]
 # print X
 # print Y
 X = X.replace('na',np.nan)
-# X = X.apply(np.float64)
+X = X.apply(np.float64)
 
-df = X
 # print pd.concat((Y,X),axis=1)
 
 def delete_trash_columns(dataset,percentage):

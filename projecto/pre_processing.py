@@ -98,7 +98,7 @@ def pre_processing(X,Y,major,replace,percentage=0.5,dummies=1,delete_columns=1,r
 	y_aux = Y
 
 	X_aux = X_aux.replace('na',np.nan)
-	X = X.apply(np.float64)
+	X_aux = X.apply(np.float64)
 
 	if(dummies):
 
@@ -106,7 +106,7 @@ def pre_processing(X,Y,major,replace,percentage=0.5,dummies=1,delete_columns=1,r
 
 	if(delete_columns):
 
-		X_aux = delete_trash_columns(X_aux)
+		delete_trash_columns(X_aux)
 
 	if(replace_na):
 

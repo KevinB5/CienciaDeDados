@@ -41,3 +41,15 @@ def error(prediction,Ytest):
 def classi_report(prediction,Ytest):
 
 	print classification_report(Ytest,prediction)
+
+def roc_curve_func(Y_test,predict,roc_color,title):
+
+    fpr, tpr, _ = roc_curve(Y_test,predict)
+    roc_auc = auc(fpr,tpr)
+
+    # plt.figure()
+    plt.plot(fpr,tpr, color=roc_color,lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(title)
+    plt.legend(loc="lower right")

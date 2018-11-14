@@ -55,6 +55,19 @@ def conf_matrix_sens_spec(Y_test,predict):
     specificity = tn*1./(tn+fp)
     print 'Specificity ',specificity
 
+def roc_curve_func(Y_test,predict,roc_color,title):
+
+    fpr, tpr, _ = roc_curve(Y_test,predict)
+    roc_auc = auc(fpr,tpr)
+
+    # plt.figure()
+    plt.plot(fpr,tpr, color=roc_color,lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(title)
+    plt.legend(loc="lower right")
+    plt.show()
+
 def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm.Blues):
     """
         This function prints and plots the confusion matrix.
@@ -91,15 +104,3 @@ def plot_confusion_matrix(cnf_matrix, classesNames, normalize=False, cmap=plt.cm
     plt.xlabel('Predicted label')
     plt.show()
 
-def roc_curve_func(Y_test,predict,roc_color,title):
-
-    fpr, tpr, _ = roc_curve(Y_test,predict)
-    roc_auc = auc(fpr,tpr)
-
-    # plt.figure()
-    plt.plot(fpr,tpr, color=roc_color,lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title(title)
-    plt.legend(loc="lower right")
-    plt.show()

@@ -20,8 +20,8 @@ def NB(X_train,Y_train,X_test):
 
 
 #Classifier Decision Tree
-def DT(X_train,Y_train,X_test,criterion,min_samples = 2,max_depth = None,leaf_nodes = None):
-	classifier = DecisionTreeClassifier(criterion = criterion, min_samples_split = min_samples, max_depth = max_depth, random_state = 0, max_leaf_nodes = leaf_nodes)
+def DT(X_train,Y_train,X_test,criterion,min_s = 2,max_d = None,leaf_nodes = None):
+	classifier = DecisionTreeClassifier(criterion = criterion, min_samples_split = min_s, max_depth = max_d, random_state = 0, max_leaf_nodes = leaf_nodes)
 	train = classifier.fit(X_train,Y_train)
 	return train.predict(X_test)
 

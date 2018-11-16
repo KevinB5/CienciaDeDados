@@ -141,3 +141,7 @@ def pre_processing(X,Y,major,replace,percentage=0.5,dummies=1,delete_columns=1,d
 		X_aux, y_aux = balance_SMOTE(X_aux,y_aux)
 
 	return X_aux, y_aux
+
+def normalization(dataset):
+    min_max_scaler = preprocessing.MinMaxScaler()
+    return min_max_scaler.fit_transform(dataset)

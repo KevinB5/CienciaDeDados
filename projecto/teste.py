@@ -41,6 +41,6 @@ delete_trash_columns(X,0.5)
 
 X = replace_missing_values_mean(X)
 # X = X.apply(np.float64)
-print X.iloc[1:,:].apply(zscore)
+print(X.iloc[1:,:].apply(zscore))
 
 # print aps_test

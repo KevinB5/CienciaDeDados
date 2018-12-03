@@ -6,6 +6,9 @@ A escolha da target variable passa por pre processar os dados, mas sem balance p
 Pré-Processamento:
 O pré-processamento é um passo importante no processo de mineração de texto. A frase "garbage in, garbage out" é particularmente aplicável a projetos de data mining e machine learning. Os métodos de coleta de dados geralmente são frouxamente controlados, resultando em valores de intervalo out-of-range (por exemplo, renda: −100),  combinações de dados impossíveis (por exemplo, sexo: masculino, grávidas: sim), missing values, etc. A análise de dados que não foram cuidadosamente selecionados para tais problemas pode produzir resultados enganosos. Assim, a representação e a qualidade dos dados são antes de tudo uma análise.
 
+Normalização:
+http://rajeshmahajan.com/standard-scaler-v-min-max-scaler-machine-learning/
+
 Razões para Pré-Processamento:
 1. Missing headers in the csv file
 2. Multiple variables are stored in one column

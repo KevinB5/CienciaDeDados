@@ -1,5 +1,10 @@
 ﻿# CienciaDeDados
  
+Conclusões LAB1:
+Os outliers, caso não sejam valores disparatados, são valores importantes para especificações dos dados como a variância, correlação etc.
+Z-score, é a standardização dos dados, pois faz simplesmente um shift dos dados para a origem, colocando a média a 0 e divide todos os pontos pelo desvio padrão, para ficar unitário. Este tipo de normalização mantém os outliers, sendo muito utilizado para casos que se tenha de lidar com PCA, clustering, logistic regression, SVM, neural networks, por estes dependerem de características dos dados, tais como a variância, correlação, etc. Vantagens: é uma normalização utilizada para facilitar por exemplo a regressão logistica, onde com os dados standardizados, mantendo a variância, se consegue reduzir os pesos da função logistica. O PCA é igualmente beneficiado pois precisa de manter as variâncias entre atributos para determinar quais as componentes principais.
+Minmax Scaler é a normalização que transforma os dados num intervalo entre 0 e 1 valores, onde os outliers perdem a sua importância, servindo mais para classificadores de distâncias ou decision trees, e em casos de processamento de imagem. Vantagens: esta normalização, como já foi dito anteriormente é bom para distâncias, ou seja, se tivermos atributos com escalas diferentes, esta normalização é a melhor para reduzir tempo de processamento e retirar um melhor proveito da vizinhança.
+ 
 DataSet DC:
 A escolha da target variable passa por pre processar os dados, mas sem balance pois cada expert pode ter classificado mais resultados como bons e não maus, mas não invalida que esteja errado. Temos de ver a accuracy ou auc para escolher qual as melhores target_variables, e ver se ao concatenar experts temos um melhor consensus.
 

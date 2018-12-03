@@ -9,6 +9,9 @@ O pré-processamento é um passo importante no processo de mineração de texto.
 Normalização:
 http://rajeshmahajan.com/standard-scaler-v-min-max-scaler-machine-learning/
 
+PCA:
+https://www.youtube.com/watch?v=FgakZw6K1QQ
+
 Razões para Pré-Processamento:
 1. Missing headers in the csv file
 2. Multiple variables are stored in one column
